@@ -1,0 +1,41 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function isAdmin() {
+      return signedIn() &&
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.active == true;
+    }
+
+    match /admins/{uid} {
+      allow read: if isAdmin() && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    match /coachingApplications/{id} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    match /newsletterSignups/{id} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    match /programs/{id} {
+      allow read: if resource.data.visible == true || isAdmin();
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /testimonials/{id} {
+      allow read: if resource.data.visible == true || isAdmin();
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /siteSettings/{id} { allow read: if true; allow write: if isAdmin(); }
+    match /homepage/{id} { allow read: if true; allow write: if isAdmin(); }
+    match /pages/{id} { allow read: if true; allow write: if isAdmin(); }
+    match /media/{id} { allow read: if true; allow write: if isAdmin(); }
+  }
+}
