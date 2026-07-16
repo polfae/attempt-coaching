@@ -36,14 +36,33 @@ type Application = {
   };
 };
 
-const statuses = [
-  "new",
-  "reviewed",
-  "contacted",
-  "accepted",
-  "waitlist",
-  "rejected",
-];
+const statuses = ["New", "Reviewing", "Accepted", "Declined", "Archived"];
+
+function normalizeStatus(status?: string) {
+  const normalized = (status || "New").toLowerCase();
+
+  if (
+    normalized === "reviewing" ||
+    normalized === "reviewed" ||
+    normalized === "contacted"
+  ) {
+    return "Reviewing";
+  }
+
+  if (normalized === "accepted") {
+    return "Accepted";
+  }
+
+  if (normalized === "declined" || normalized === "rejected") {
+    return "Declined";
+  }
+
+  if (normalized === "archived" || normalized === "waitlist") {
+    return "Archived";
+  }
+
+  return "New";
+}
 
 function formatDate(createdAt: Application["createdAt"]) {
   if (!createdAt?.seconds) return "—";
@@ -72,6 +91,7 @@ export function ApplicationsClient() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [search, setSearch] = useState("");
   const [notes, setNotes] = useState("");
+  const [pendingStatus, setPendingStatus] = useState("New");
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -86,6 +106,7 @@ export function ApplicationsClient() {
       setNotes(
         ((applications[0] as Application).internalNotes as string) || "",
       );
+      setPendingStatus(normalizeStatus((applications[0] as Application).status));
     }
   }
 
@@ -95,7 +116,7 @@ export function ApplicationsClient() {
 
   const filteredItems = useMemo(() => {
     return items.filter((item) => {
-      const itemStatus = item.status ?? "new";
+      const itemStatus = normalizeStatus(item.status);
       const matchesStatus =
         statusFilter === "all" || itemStatus === statusFilter;
 
@@ -126,6 +147,7 @@ export function ApplicationsClient() {
     if (selected) {
       setSelectedId(selected.id);
       setNotes(selected.internalNotes || "");
+      setPendingStatus(normalizeStatus(selected.status));
     }
   }, [selected?.id]);
 
@@ -141,6 +163,7 @@ export function ApplicationsClient() {
   function selectApplication(item: Application) {
     setSelectedId(item.id);
     setNotes(item.internalNotes || "");
+    setPendingStatus(normalizeStatus(item.status));
   }
 
   if (loading) {
@@ -179,7 +202,7 @@ export function ApplicationsClient() {
               ))}
             </select>
             <p className="adminHelpText">
-              Use this to focus on new, contacted, or accepted applicants.
+              Use this to focus on New, Reviewing, Accepted, Declined, or Archived applications.
             </p>
           </div>
         </div>
@@ -231,7 +254,7 @@ export function ApplicationsClient() {
                       )}
                     </td>
                     <td>
-                      <span className="status">{item.status ?? "new"}</span>
+                      <span className="status">{normalizeStatus(item.status)}</span>
                     </td>
                     <td>{formatDate(item.createdAt)}</td>
                   </tr>
@@ -268,7 +291,7 @@ export function ApplicationsClient() {
                 </p>
               </div>
 
-              <span className="status">{selected.status ?? "new"}</span>
+              <span className="status">{normalizeStatus(selected.status)}</span>
             </div>
 
             <div className="grid3" style={{ marginBottom: 24 }}>
@@ -353,8 +376,8 @@ export function ApplicationsClient() {
               <label htmlFor="applicationStatus">Application status</label>
               <select
                 id="applicationStatus"
-                value={selected.status ?? "new"}
-                onChange={(event) => saveApplication(event.target.value)}
+                value={pendingStatus}
+                onChange={(event) => setPendingStatus(event.target.value)}
                 disabled={saving}
               >
                 {statuses.map((status) => (
@@ -364,7 +387,8 @@ export function ApplicationsClient() {
                 ))}
               </select>
               <p className="adminHelpText">
-                Status changes save immediately when you select a new option.
+                Choose a status, then save it inside the admin panel. No
+                applicant email is sent yet.
               </p>
             </div>
 
@@ -384,11 +408,11 @@ export function ApplicationsClient() {
             <button
               className="btn btnPrimary"
               type="button"
-              onClick={() => saveApplication(selected.status ?? "new", notes)}
+              onClick={() => saveApplication(pendingStatus, notes)}
               disabled={saving}
               style={{ marginTop: 16 }}
             >
-              {saving ? "Saving..." : "Save Notes"}
+              {saving ? "Saving..." : "Save Status and Notes"}
             </button>
           </div>
         )}

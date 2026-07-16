@@ -1,7 +1,6 @@
 "use client";
 
 import { FormEvent, useMemo, useState } from "react";
-import { submitApplication } from "@/lib/firestore";
 
 type StepId = "details" | "lifting" | "fit";
 
@@ -125,30 +124,40 @@ export function ApplyForm() {
     setStatus("saving");
 
     try {
-      await submitApplication({
-        name: data.name,
-        email: data.email,
-        country: data.country,
-        age: data.age,
-        bodyweight: data.bodyweight,
-        trainingAge: data.trainingAge,
-        coachingPriority: data.coachingPriority,
-        readiness: data.readiness,
-        nextCompetition: data.nextCompetition,
-        bestSnatch: data.bestSnatch,
-        bestCleanJerk: data.bestCleanJerk,
-        bestTotal: data.bestTotal,
-        competitionExperience: data.competitionExperience,
-        currentTraining: data.currentTraining,
-        goals: data.goals,
-        injuries: data.injuries,
-        availability: data.availability,
-        links: data.links,
-        struggle: data.struggle,
-        whyAttempt: data.whyAttempt,
-        onlineCoachingBefore: data.onlineCoachingBefore,
-        consent: data.consent === "on",
+      const response = await fetch("/api/coaching-application", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: data.name,
+          email: data.email,
+          country: data.country,
+          age: data.age,
+          bodyweight: data.bodyweight,
+          trainingAge: data.trainingAge,
+          coachingPriority: data.coachingPriority,
+          readiness: data.readiness,
+          nextCompetition: data.nextCompetition,
+          bestSnatch: data.bestSnatch,
+          bestCleanJerk: data.bestCleanJerk,
+          bestTotal: data.bestTotal,
+          competitionExperience: data.competitionExperience,
+          currentTraining: data.currentTraining,
+          goals: data.goals,
+          injuries: data.injuries,
+          availability: data.availability,
+          links: data.links,
+          struggle: data.struggle,
+          whyAttempt: data.whyAttempt,
+          onlineCoachingBefore: data.onlineCoachingBefore,
+          consent: data.consent === "on",
+        }),
       });
+
+      if (!response.ok) {
+        throw new Error("Application submission failed.");
+      }
 
       form.reset();
       setActiveStep(0);
@@ -164,9 +173,9 @@ export function ApplyForm() {
       <div className="panel">
         <h2>Application received.</h2>
         <p>
-          I’ll review your training background, goals, and coaching fit. If
-          Attempt Coaching looks like the right next step, I’ll contact you with
-          the next move.
+          Thank you for your application. Your application has been received and
+          will be reviewed shortly. You will be contacted by email once a
+          decision has been made.
         </p>
       </div>
     );

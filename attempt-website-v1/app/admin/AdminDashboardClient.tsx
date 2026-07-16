@@ -25,7 +25,6 @@ type DashboardApplication = {
 type DashboardStats = {
   applications: number;
   newApplications: number;
-  contactedApplications: number;
   newsletterSignups: number;
   programs: number;
   visiblePrograms: number;
@@ -36,7 +35,6 @@ type DashboardStats = {
 const initialStats: DashboardStats = {
   applications: 0,
   newApplications: 0,
-  contactedApplications: 0,
   newsletterSignups: 0,
   programs: 0,
   visiblePrograms: 0,
@@ -73,10 +71,7 @@ export function AdminDashboardClient() {
         setStats({
           applications: applications.length,
           newApplications: applications.filter(
-            (item: any) => !item.status || item.status === "new",
-          ).length,
-          contactedApplications: applications.filter(
-            (item: any) => item.status === "contacted",
+            (item: any) => !item.status || item.status === "new" || item.status === "New",
           ).length,
           newsletterSignups: newsletterSignups.length,
           programs: programs.length,

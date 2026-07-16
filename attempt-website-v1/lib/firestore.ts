@@ -555,7 +555,7 @@ export async function submitApplication(data: CoachingApplication) {
 
   return addDoc(collection(db, "coachingApplications"), {
     ...data,
-    status: "new",
+    status: "New",
     internalNotes: "",
     createdAt: serverTimestamp(),
   });
