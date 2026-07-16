@@ -72,15 +72,6 @@ export function AdminShell({
                 key={link.href}
                 href={link.href}
                 aria-current={isActive ? "page" : undefined}
-                style={
-                  isActive
-                    ? {
-                        background: "rgba(255,255,255,0.08)",
-                        color: "white",
-                        borderColor: "rgba(255,255,255,0.14)",
-                      }
-                    : undefined
-                }
               >
                 {link.label}
               </Link>

@@ -8,6 +8,7 @@ import {
   Program,
   updateProgram,
 } from "@/lib/firestore";
+import { AdminFormField } from "@/components/AdminFormField";
 
 type ProgramForm = {
   title: string;
@@ -190,23 +191,15 @@ export function ProgramsClient() {
   return (
     <div style={{ display: "grid", gap: 18 }}>
       <div className="adminCard">
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            gap: 18,
-            alignItems: "end",
-          }}
-        >
-          <div className="field" style={{ flex: 1 }}>
-            <label htmlFor="programSearch">Search programs</label>
-            <input
-              id="programSearch"
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search by title, level, duration, goal..."
-            />
-          </div>
+        <div className="adminSearchBar">
+          <AdminFormField
+            id="programSearch"
+            label="Search programs"
+            value={search}
+            onChange={setSearch}
+            placeholder="Search by title, level, duration, goal..."
+            help="Filters the program list below without changing public content."
+          />
 
           <button
             className="btn btnPrimary"
@@ -218,14 +211,7 @@ export function ProgramsClient() {
         </div>
       </div>
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "minmax(360px, 0.95fr) minmax(420px, 1.05fr)",
-          gap: 18,
-          alignItems: "start",
-        }}
-      >
+      <div className="adminCmsLayout">
         <div className="adminCard" style={{ padding: 0, overflow: "hidden" }}>
           {loading ? (
             <div style={{ padding: 22 }}>Loading programs...</div>
@@ -316,150 +302,126 @@ export function ProgramsClient() {
         </div>
 
         <form className="adminCard form" onSubmit={onSubmit}>
-          <div>
-            <h2 style={{ margin: 0, color: "#16181d" }}>
+          <div className="adminCardHeader">
+            <h2>
               {selectedId ? "Edit Program" : "Create Program"}
             </h2>
-            <p style={{ marginBottom: 0 }}>
+            <p>
               Add digital programs here. Visible programs will show on the
               public Programs page.
             </p>
           </div>
 
           <div className="grid2">
-            <div className="field">
-              <label htmlFor="title">Title</label>
-              <input
-                id="title"
-                value={form.title}
-                onChange={(event) => updateField("title", event.target.value)}
-                required
-              />
-            </div>
+            <AdminFormField
+              id="title"
+              label="Title"
+              value={form.title}
+              onChange={(value) => updateField("title", value)}
+              required
+              help="Public program name shown on cards and detail pages."
+            />
 
-            <div className="field">
-              <label htmlFor="slug">Slug</label>
-              <input
-                id="slug"
-                value={form.slug}
-                onChange={(event) =>
-                  updateField("slug", slugify(event.target.value))
-                }
-                placeholder="beginner-weightlifting-program"
-                required
-              />
-            </div>
-          </div>
-
-          <div className="field">
-            <label htmlFor="description">Description</label>
-            <textarea
-              id="description"
-              value={form.description}
-              onChange={(event) =>
-                updateField("description", event.target.value)
-              }
+            <AdminFormField
+              id="slug"
+              label="Slug"
+              value={form.slug}
+              onChange={(value) => updateField("slug", slugify(value))}
+              placeholder="beginner-weightlifting-program"
               required
             />
           </div>
 
-          <div className="grid2">
-            <div className="field">
-              <label htmlFor="level">Level</label>
-              <input
-                id="level"
-                value={form.level}
-                onChange={(event) => updateField("level", event.target.value)}
-                placeholder="Beginner / Intermediate / Advanced"
-                required
-              />
-            </div>
-
-            <div className="field">
-              <label htmlFor="duration">Duration</label>
-              <input
-                id="duration"
-                value={form.duration}
-                onChange={(event) =>
-                  updateField("duration", event.target.value)
-                }
-                placeholder="8 weeks"
-                required
-              />
-            </div>
-          </div>
+          <AdminFormField
+            id="description"
+            label="Description"
+            type="textarea"
+            value={form.description}
+            onChange={(value) => updateField("description", value)}
+            required
+            help="Short sales description shown on the Programs page."
+          />
 
           <div className="grid2">
-            <div className="field">
-              <label htmlFor="daysPerWeek">Training days per week</label>
-              <input
-                id="daysPerWeek"
-                value={form.daysPerWeek}
-                onChange={(event) =>
-                  updateField("daysPerWeek", event.target.value)
-                }
-                placeholder="4 days / week"
-                required
-              />
-            </div>
-
-            <div className="field">
-              <label htmlFor="price">Price</label>
-              <input
-                id="price"
-                value={form.price}
-                onChange={(event) => updateField("price", event.target.value)}
-                placeholder="499 DKK"
-                required
-              />
-            </div>
-          </div>
-
-          <div className="field">
-            <label htmlFor="goal">Goal</label>
-            <input
-              id="goal"
-              value={form.goal}
-              onChange={(event) => updateField("goal", event.target.value)}
-              placeholder="Build technical consistency in the snatch and clean & jerk"
+            <AdminFormField
+              id="level"
+              label="Level"
+              value={form.level}
+              onChange={(value) => updateField("level", value)}
+              placeholder="Beginner / Intermediate / Advanced"
               required
+              help="Training experience level this program is best suited for."
             />
-          </div>
 
-          <div className="field">
-            <label htmlFor="imageUrl">Image URL</label>
-            <input
-              id="imageUrl"
-              value={form.imageUrl}
-              onChange={(event) => updateField("imageUrl", event.target.value)}
-              placeholder="https://..."
+            <AdminFormField
+              id="duration"
+              label="Duration"
+              value={form.duration}
+              onChange={(value) => updateField("duration", value)}
+              placeholder="8 weeks"
+              required
+              help="How long the program runs."
             />
           </div>
 
           <div className="grid2">
-            <div className="field">
-              <label htmlFor="productLink">Product/payment link</label>
-              <input
-                id="productLink"
-                value={form.productLink}
-                onChange={(event) =>
-                  updateField("productLink", event.target.value)
-                }
-                placeholder="Shopify or checkout link later"
-              />
-            </div>
+            <AdminFormField
+              id="daysPerWeek"
+              label="Training days per week"
+              value={form.daysPerWeek}
+              onChange={(value) => updateField("daysPerWeek", value)}
+              placeholder="4 days / week"
+              required
+              help="Shown as a practical training commitment."
+            />
 
-            <div className="field">
-              <label htmlFor="downloadLink">Download link</label>
-              <input
-                id="downloadLink"
-                value={form.downloadLink}
-                onChange={(event) =>
-                  updateField("downloadLink", event.target.value)
-                }
-                placeholder="Program PDF/file link later"
-              />
-            </div>
+            <AdminFormField
+              id="price"
+              label="Price"
+              value={form.price}
+              onChange={(value) => updateField("price", value)}
+              placeholder="499 DKK"
+              required
+              help="Display price only. Payments happen through the product link."
+            />
+          </div>
+
+          <AdminFormField
+            id="goal"
+            label="Goal"
+            value={form.goal}
+            onChange={(value) => updateField("goal", value)}
+            placeholder="Build technical consistency in the snatch and clean & jerk"
+            required
+            help="One clear outcome the program is built around."
+          />
+
+          <AdminFormField
+            id="imageUrl"
+            label="Image URL"
+            value={form.imageUrl}
+            onChange={(value) => updateField("imageUrl", value)}
+            placeholder="https://..."
+          />
+
+          <div className="grid2">
+            <AdminFormField
+              id="productLink"
+              label="Product/payment link"
+              value={form.productLink}
+              onChange={(value) => updateField("productLink", value)}
+              placeholder="Shopify or checkout link later"
+              help="Used by the Buy Program button when a program is available."
+            />
+
+            <AdminFormField
+              id="downloadLink"
+              label="Download link"
+              value={form.downloadLink}
+              onChange={(value) => updateField("downloadLink", value)}
+              placeholder="Program PDF/file link later"
+              help="Private or future delivery link. Keep blank if not needed."
+            />
           </div>
 
           <label className="checkboxRow" style={{ color: "#545b68" }}>

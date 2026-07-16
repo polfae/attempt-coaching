@@ -5,6 +5,7 @@ import {
   doc,
   getDoc,
   getDocs,
+  limit,
   orderBy,
   query,
   serverTimestamp,
@@ -82,6 +83,24 @@ export type MediaAsset = {
   size: number;
   url: string;
   storagePath: string;
+  createdAt?: unknown;
+  updatedAt?: unknown;
+};
+
+export type AnalyticsEvent = {
+  id?: string;
+  type: "page_view";
+  path: string;
+  title?: string;
+  referrer?: string;
+  source?: string;
+  device?: "desktop" | "tablet" | "mobile";
+  country?: string;
+  timezone?: string;
+  locale?: string;
+  visitorId: string;
+  sessionId: string;
+  engaged?: boolean;
   createdAt?: unknown;
   updatedAt?: unknown;
 };
@@ -777,6 +796,46 @@ export async function deleteMediaAsset(id: string) {
   }
 
   return deleteDoc(doc(db, "media", id));
+}
+
+export async function createAnalyticsEvent(data: AnalyticsEvent) {
+  if (!hasFirebaseConfig || !db) {
+    return { offline: true };
+  }
+
+  const { id, ...eventData } = data;
+
+  return addDoc(collection(db, "analyticsEvents"), {
+    ...eventData,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function markAnalyticsEventEngaged(id: string) {
+  if (!hasFirebaseConfig || !db) return;
+
+  return updateDoc(doc(db, "analyticsEvents", id), {
+    engaged: true,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function getAnalyticsEvents(maxEvents = 1000) {
+  return readWithFallback("analytics events", [], async (activeDb) => {
+    const snapshot = await getDocs(
+      query(
+        collection(activeDb, "analyticsEvents"),
+        orderBy("createdAt", "desc"),
+        limit(maxEvents),
+      ),
+    );
+
+    return snapshot.docs.map((item) => ({
+      id: item.id,
+      ...item.data(),
+    })) as AnalyticsEvent[];
+  });
 }
 
 export async function getSiteSettings() {

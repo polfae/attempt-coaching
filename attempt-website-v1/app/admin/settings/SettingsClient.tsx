@@ -7,6 +7,7 @@ import {
   SiteSettings,
   updateSiteSettings,
 } from "@/lib/firestore";
+import { AdminFormField } from "@/components/AdminFormField";
 
 export function SettingsClient() {
   const [form, setForm] = useState<SiteSettings>(defaultSiteSettings);
@@ -57,100 +58,80 @@ export function SettingsClient() {
 
   return (
     <form className="adminCard form" onSubmit={onSubmit}>
-      <div>
-        <h3 style={{ margin: 0, color: "#16181d" }}>General site settings</h3>
-        <p style={{ marginBottom: 0 }}>
+      <div className="adminCardHeader">
+        <h3>General site settings</h3>
+        <p>
           Manage the basic information used across the Attempt website.
         </p>
       </div>
 
       <div className="grid2">
-        <div className="field">
-          <label htmlFor="siteName">Site name</label>
-          <input
-            id="siteName"
-            value={form.siteName}
-            onChange={(event) => updateField("siteName", event.target.value)}
-            placeholder="Attempt"
-            required
-          />
-        </div>
+        <AdminFormField
+          id="siteName"
+          label="Site name"
+          value={form.siteName}
+          onChange={(value) => updateField("siteName", value)}
+          placeholder="Attempt"
+          required
+          help="Brand name used in footer copyright and fallback metadata."
+        />
 
-        <div className="field">
-          <label htmlFor="contactEmail">Contact email</label>
-          <input
-            id="contactEmail"
-            type="email"
-            value={form.contactEmail}
-            onChange={(event) =>
-              updateField("contactEmail", event.target.value)
-            }
-            placeholder="hello@attemptcoaching.com"
-          />
-        </div>
-      </div>
-
-      <div className="field">
-        <label htmlFor="instagramUrl">Instagram URL</label>
-        <input
-          id="instagramUrl"
-          value={form.instagramUrl}
-          onChange={(event) => updateField("instagramUrl", event.target.value)}
-          placeholder="https://instagram.com/attempt..."
+        <AdminFormField
+          id="contactEmail"
+          label="Contact email"
+          type="email"
+          value={form.contactEmail}
+          onChange={(value) => updateField("contactEmail", value)}
+          placeholder="hello@attemptcoaching.com"
         />
       </div>
 
-      <div className="field">
-        <label htmlFor="footerText">Footer text</label>
-        <textarea
-          id="footerText"
-          value={form.footerText}
-          onChange={(event) => updateField("footerText", event.target.value)}
-          placeholder="Short footer description..."
-        />
-      </div>
+      <AdminFormField
+        id="instagramUrl"
+        label="Instagram URL"
+        value={form.instagramUrl}
+        onChange={(value) => updateField("instagramUrl", value)}
+        placeholder="https://instagram.com/attempt..."
+      />
+
+      <AdminFormField
+        id="footerText"
+        label="Footer text"
+        type="textarea"
+        value={form.footerText}
+        onChange={(value) => updateField("footerText", value)}
+        placeholder="Short footer description..."
+        help="Short brand description shown near the bottom of the site."
+      />
 
       <div className="grid2">
-        <div className="field">
-          <label htmlFor="defaultSeoTitle">Default SEO title</label>
-          <input
-            id="defaultSeoTitle"
-            value={form.defaultSeoTitle}
-            onChange={(event) =>
-              updateField("defaultSeoTitle", event.target.value)
-            }
-            placeholder="Attempt Coaching"
-          />
-        </div>
+        <AdminFormField
+          id="defaultSeoTitle"
+          label="Default SEO title"
+          value={form.defaultSeoTitle}
+          onChange={(value) => updateField("defaultSeoTitle", value)}
+          placeholder="Attempt Coaching"
+          maxLength={70}
+        />
 
-        <div className="field">
-          <label htmlFor="defaultSeoDescription">Default SEO description</label>
-          <textarea
-            id="defaultSeoDescription"
-            value={form.defaultSeoDescription}
-            onChange={(event) =>
-              updateField("defaultSeoDescription", event.target.value)
-            }
-            placeholder="Premium weightlifting coaching..."
-          />
-        </div>
+        <AdminFormField
+          id="defaultSeoDescription"
+          label="Default SEO description"
+          type="textarea"
+          value={form.defaultSeoDescription}
+          onChange={(value) => updateField("defaultSeoDescription", value)}
+          placeholder="Premium weightlifting coaching..."
+          maxLength={160}
+        />
       </div>
 
-      <div
-        style={{
-          display: "flex",
-          gap: 12,
-          alignItems: "center",
-          flexWrap: "wrap",
-        }}
-      >
+      <div className="adminSaveBar">
+        <span>These settings affect multiple public pages.</span>
         <button className="btn btnPrimary" type="submit" disabled={saving}>
           {saving ? "Saving..." : "Save Settings"}
         </button>
 
-        {saved && (
-          <span style={{ color: "#006b8f", fontWeight: 800 }}>Saved</span>
-        )}
+        {saved && <span className="adminSaveStatus">Saved</span>}
       </div>
     </form>
   );

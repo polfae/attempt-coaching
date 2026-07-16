@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { getApplications, updateApplicationStatus } from "@/lib/firestore";
+import { AdminFormField } from "@/components/AdminFormField";
 
 type Application = {
   id: string;
@@ -56,9 +57,9 @@ function formatDate(createdAt: Application["createdAt"]) {
 
 function Field({ label, value }: { label: string; value?: string | boolean }) {
   return (
-    <div style={{ display: "grid", gap: 4 }}>
-      <strong style={{ color: "#16181d", fontSize: 13 }}>{label}</strong>
-      <span style={{ color: "#545b68", lineHeight: 1.55 }}>
+    <div className="adminReadOnlyField">
+      <strong>{label}</strong>
+      <span>
         {value === true ? "Yes" : value === false ? "No" : value || "—"}
       </span>
     </div>
@@ -153,23 +154,15 @@ export function ApplicationsClient() {
   return (
     <div style={{ display: "grid", gap: 18 }}>
       <div className="adminCard">
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 220px",
-            gap: 14,
-            alignItems: "end",
-          }}
-        >
-          <div className="field">
-            <label htmlFor="applicationSearch">Search applications</label>
-            <input
-              id="applicationSearch"
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search by name, email, country, goals..."
-            />
-          </div>
+        <div className="adminFilterGrid">
+          <AdminFormField
+            id="applicationSearch"
+            label="Search applications"
+            value={search}
+            onChange={setSearch}
+            placeholder="Search by name, email, country, goals..."
+            help="Filters the application list without changing any applicant data."
+          />
 
           <div className="field">
             <label htmlFor="statusFilter">Status</label>
@@ -185,18 +178,14 @@ export function ApplicationsClient() {
                 </option>
               ))}
             </select>
+            <p className="adminHelpText">
+              Use this to focus on new, contacted, or accepted applicants.
+            </p>
           </div>
         </div>
       </div>
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "minmax(320px, 0.85fr) minmax(420px, 1.15fr)",
-          gap: 18,
-          alignItems: "start",
-        }}
-      >
+      <div className="adminCmsLayout">
         <div className="adminCard" style={{ padding: 0, overflow: "hidden" }}>
           <table className="adminTable">
             <thead>
@@ -269,11 +258,11 @@ export function ApplicationsClient() {
                 marginBottom: 24,
               }}
             >
-              <div>
-                <h2 style={{ margin: 0, color: "#16181d" }}>
+              <div className="adminCardHeader">
+                <h2>
                   {selected.name || "No name"}
                 </h2>
-                <p style={{ margin: "8px 0 0" }}>
+                <p>
                   {selected.email || "No email"} ·{" "}
                   {selected.country || "No country"}
                 </p>
@@ -298,16 +287,10 @@ export function ApplicationsClient() {
             </div>
 
             <div
-              style={{
-                marginBottom: 24,
-                padding: 18,
-                border: "1px solid #eceef3",
-                borderRadius: 18,
-                background: "#f8f9fc",
-              }}
+              className="adminTriageBox"
             >
-              <h3 style={{ margin: 0, color: "#16181d" }}>Triage summary</h3>
-              <p style={{ margin: "8px 0 0" }}>
+              <h3>Triage summary</h3>
+              <p>
                 {[
                   selected.coachingPriority &&
                     `Priority: ${selected.coachingPriority}`,
@@ -380,6 +363,9 @@ export function ApplicationsClient() {
                   </option>
                 ))}
               </select>
+              <p className="adminHelpText">
+                Status changes save immediately when you select a new option.
+              </p>
             </div>
 
             <div className="field" style={{ marginTop: 16 }}>
@@ -390,6 +376,9 @@ export function ApplicationsClient() {
                 onChange={(event) => setNotes(event.target.value)}
                 placeholder="Private notes. Example: Good candidate. Ask about training availability and competition plans."
               />
+              <p className="adminHelpText">
+                Private notes are only visible in the CMS.
+              </p>
             </div>
 
             <button

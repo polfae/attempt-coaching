@@ -7,6 +7,7 @@ import {
   HomepageContent,
   updateHomepageContent,
 } from "@/lib/firestore";
+import { AdminFormField, AdminSectionHeader } from "@/components/AdminFormField";
 
 type FieldConfig = {
   key: keyof HomepageContent;
@@ -152,55 +153,42 @@ export function HomepageClient() {
 
   return (
     <form className="form" onSubmit={onSubmit}>
-      <div className="adminCard">
-        <h3 style={{ margin: 0, color: "#16181d" }}>Homepage content</h3>
-        <p style={{ marginBottom: 0 }}>
+      <div className="adminCard adminCardHeader">
+        <h3>Homepage content</h3>
+        <p>
           Edit the main homepage copy. These fields update the public homepage.
         </p>
       </div>
 
       {sections.map((section) => (
         <div className="adminCard form" key={section.title}>
-          <h3 style={{ margin: 0, color: "#16181d" }}>{section.title}</h3>
+          <AdminSectionHeader
+            title={section.title}
+            description="Content in this group maps to one public homepage section."
+          />
 
           <div className="grid2">
             {section.fields.map((field) => (
-              <div className="field" key={String(field.key)}>
-                <label htmlFor={String(field.key)}>{field.label}</label>
-
-                {field.type === "textarea" ? (
-                  <textarea
-                    id={String(field.key)}
-                    value={String(form[field.key] ?? "")}
-                    onChange={(event) =>
-                      updateField(field.key, event.target.value)
-                    }
-                  />
-                ) : (
-                  <input
-                    id={String(field.key)}
-                    value={String(form[field.key] ?? "")}
-                    onChange={(event) =>
-                      updateField(field.key, event.target.value)
-                    }
-                  />
-                )}
-              </div>
+              <AdminFormField
+                key={String(field.key)}
+                id={String(field.key)}
+                label={field.label}
+                type={field.type === "textarea" ? "textarea" : "input"}
+                value={String(form[field.key] ?? "")}
+                onChange={(value) => updateField(field.key, value)}
+              />
             ))}
           </div>
         </div>
       ))}
 
-      <div className="adminCard">
-        <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-          <button className="btn btnPrimary" type="submit" disabled={saving}>
-            {saving ? "Saving..." : "Save Homepage"}
-          </button>
+      <div className="adminCard adminSaveBar">
+        <span>Review your changes, then save the homepage content.</span>
+        <button className="btn btnPrimary" type="submit" disabled={saving}>
+          {saving ? "Saving..." : "Save Homepage"}
+        </button>
 
-          {saved && (
-            <span style={{ color: "#006b8f", fontWeight: 800 }}>Saved</span>
-          )}
-        </div>
+        {saved && <span className="adminSaveStatus">Saved</span>}
       </div>
     </form>
   );

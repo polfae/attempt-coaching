@@ -1,7 +1,9 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useMemo, useState } from "react";
 import { submitApplication } from "@/lib/firestore";
+
+type StepId = "details" | "lifting" | "fit";
 
 const fields = [
   ["name", "Name", "text", true],
@@ -30,15 +32,90 @@ const textareas = [
   ["onlineCoachingBefore", "Have you used online coaching before?"],
 ] as const;
 
+const stepConfig: {
+  id: StepId;
+  eyebrow: string;
+  title: string;
+  description: string;
+}[] = [
+  {
+    id: "details",
+    eyebrow: "Step 01",
+    title: "Your details",
+    description: "Start with the basics so I know who is applying.",
+  },
+  {
+    id: "lifting",
+    eyebrow: "Step 02",
+    title: "Your lifting",
+    description:
+      "Share your training background, current numbers, and coaching priority.",
+  },
+  {
+    id: "fit",
+    eyebrow: "Step 03",
+    title: "Goals and fit",
+    description:
+      "This is where the coaching fit becomes clear. Specific answers help.",
+  },
+];
+
 export function ApplyForm() {
   const [status, setStatus] = useState<"idle" | "saving" | "sent" | "error">(
     "idle",
   );
+  const [activeStep, setActiveStep] = useState(0);
+  const [stepError, setStepError] = useState("");
+
+  const currentStep = stepConfig[activeStep];
+  const progress = useMemo(
+    () => ((activeStep + 1) / stepConfig.length) * 100,
+    [activeStep],
+  );
+
+  function validateCurrentStep(form: HTMLFormElement) {
+    const selector = `[data-step="${currentStep.id}"]`;
+    const currentPanel = form.querySelector(selector);
+    const requiredFields = Array.from(
+      currentPanel?.querySelectorAll(
+        "input[required], textarea[required], select[required]",
+      ) ?? [],
+    ) as Array<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>;
+
+    const invalidField = requiredFields.find((field) => !field.checkValidity());
+
+    if (invalidField) {
+      invalidField.reportValidity();
+      setStepError("Complete the required fields before moving on.");
+      return false;
+    }
+
+    setStepError("");
+    return true;
+  }
+
+  function goToNextStep(form: HTMLFormElement) {
+    if (!validateCurrentStep(form)) {
+      return;
+    }
+
+    setActiveStep((current) => Math.min(current + 1, stepConfig.length - 1));
+  }
+
+  function goToPreviousStep() {
+    setStepError("");
+    setActiveStep((current) => Math.max(current - 1, 0));
+  }
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     const form = event.currentTarget;
+
+    if (!validateCurrentStep(form)) {
+      return;
+    }
+
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries()) as Record<
       string,
@@ -74,6 +151,7 @@ export function ApplyForm() {
       });
 
       form.reset();
+      setActiveStep(0);
       setStatus("sent");
     } catch (error) {
       console.error(error);
@@ -96,18 +174,55 @@ export function ApplyForm() {
 
   return (
     <form className="panel form applyForm" onSubmit={onSubmit}>
-      <div>
-        <h2>Coaching application.</h2>
-        <p>
-          Clear answers help me understand whether coaching can genuinely help
-          you right now.
-        </p>
+      <div className="applyFormHeader">
+        <div>
+          <h2>Coaching application.</h2>
+          <p>
+            Clear answers help me understand whether coaching can genuinely help
+            you right now.
+          </p>
+        </div>
+
+        <div className="applyStepCount">
+          {activeStep + 1}/{stepConfig.length}
+        </div>
       </div>
 
-      <div className="applySection">
+      <div className="applyProgress" aria-hidden="true">
+        <span style={{ width: `${progress}%` }} />
+      </div>
+
+      <div className="applySteps" aria-label="Application progress">
+        {stepConfig.map((step, index) => (
+          <button
+            key={step.id}
+            type="button"
+            className={index === activeStep ? "active" : ""}
+            onClick={() => {
+              if (index < activeStep) {
+                setActiveStep(index);
+                setStepError("");
+              }
+            }}
+            disabled={index > activeStep}
+          >
+            <span>{step.eyebrow}</span>
+            {step.title}
+          </button>
+        ))}
+      </div>
+
+      <div
+        className={`applySection applyStepPanel ${
+          activeStep === 0 ? "active" : ""
+        }`}
+        data-step="details"
+        hidden={activeStep !== 0}
+      >
         <div>
-          <div className="kicker">Step 01</div>
-          <h3>Your details</h3>
+          <div className="kicker">{currentStep.eyebrow}</div>
+          <h3>{stepConfig[0].title}</h3>
+          <p>{stepConfig[0].description}</p>
         </div>
 
         <div className="grid3">
@@ -120,10 +235,17 @@ export function ApplyForm() {
         </div>
       </div>
 
-      <div className="applySection">
+      <div
+        className={`applySection applyStepPanel ${
+          activeStep === 1 ? "active" : ""
+        }`}
+        data-step="lifting"
+        hidden={activeStep !== 1}
+      >
         <div>
-          <div className="kicker">Step 02</div>
-          <h3>Your lifting</h3>
+          <div className="kicker">{stepConfig[1].eyebrow}</div>
+          <h3>{stepConfig[1].title}</h3>
+          <p>{stepConfig[1].description}</p>
         </div>
 
         <div className="grid3">
@@ -165,10 +287,17 @@ export function ApplyForm() {
         </div>
       </div>
 
-      <div className="applySection">
+      <div
+        className={`applySection applyStepPanel ${
+          activeStep === 2 ? "active" : ""
+        }`}
+        data-step="fit"
+        hidden={activeStep !== 2}
+      >
         <div>
-          <div className="kicker">Step 03</div>
-          <h3>Goals and fit</h3>
+          <div className="kicker">{stepConfig[2].eyebrow}</div>
+          <h3>{stepConfig[2].title}</h3>
+          <p>{stepConfig[2].description}</p>
         </div>
 
         {textareas.map(([name, label]) => (
@@ -177,20 +306,43 @@ export function ApplyForm() {
             <textarea id={name} name={name} />
           </div>
         ))}
+
+        <label className="checkboxRow">
+          <input name="consent" type="checkbox" required />
+          <span>I consent to being contacted about my coaching application.</span>
+        </label>
       </div>
 
-      <label className="checkboxRow">
-        <input name="consent" type="checkbox" required />
-        <span>I consent to being contacted about my coaching application.</span>
-      </label>
+      {stepError && <p className="applyStepError">{stepError}</p>}
 
-      <button
-        className="btn btnPrimary"
-        type="submit"
-        disabled={status === "saving"}
-      >
-        {status === "saving" ? "Sending..." : "Submit Application"}
-      </button>
+      <div className="applyFormActions">
+        <button
+          className="btn btnGhost"
+          type="button"
+          onClick={goToPreviousStep}
+          disabled={activeStep === 0 || status === "saving"}
+        >
+          Back
+        </button>
+
+        {activeStep < stepConfig.length - 1 ? (
+          <button
+            className="btn btnPrimary"
+            type="button"
+            onClick={(event) => goToNextStep(event.currentTarget.form!)}
+          >
+            Next Step
+          </button>
+        ) : (
+          <button
+            className="btn btnPrimary"
+            type="submit"
+            disabled={status === "saving"}
+          >
+            {status === "saving" ? "Sending..." : "Submit Application"}
+          </button>
+        )}
+      </div>
 
       {status === "error" && (
         <p>Something went wrong. Check Firebase configuration or try again.</p>

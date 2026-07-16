@@ -9,6 +9,7 @@ import {
   MediaAsset,
 } from "@/lib/firestore";
 import { hasFirebaseConfig, storage } from "@/lib/firebase";
+import { AdminFormField } from "@/components/AdminFormField";
 
 type MediaForm = {
   title: string;
@@ -177,30 +178,29 @@ export function MediaClient() {
   return (
     <div style={{ display: "grid", gap: 18 }}>
       <form className="adminCard form" onSubmit={onSubmit}>
-        <div>
-          <h3 style={{ margin: 0, color: "#16181d" }}>Upload media</h3>
-          <p style={{ marginBottom: 0 }}>
+        <div className="adminCardHeader">
+          <h3>Upload media</h3>
+          <p>
             Add images, videos, or PDFs for homepage visuals, programs,
             testimonials, and content pages.
           </p>
         </div>
 
         {!hasFirebaseConfig && (
-          <p style={{ margin: 0, color: "#8a1f1f", fontWeight: 800 }}>
+          <p className="adminErrorText">
             Firebase is not configured, so uploads are disabled.
           </p>
         )}
 
         <div className="grid2">
-          <div className="field">
-            <label htmlFor="mediaTitle">Title</label>
-            <input
-              id="mediaTitle"
-              value={form.title}
-              onChange={(event) => updateField("title", event.target.value)}
-              placeholder="Homepage hero image"
-            />
-          </div>
+          <AdminFormField
+            id="mediaTitle"
+            label="Title"
+            value={form.title}
+            onChange={(value) => updateField("title", value)}
+            placeholder="Homepage hero image"
+            help="Internal label used to find this asset later."
+          />
 
           <div className="field">
             <label htmlFor="mediaUsage">Usage</label>
@@ -217,18 +217,19 @@ export function MediaClient() {
               <option>SEO / social</option>
               <option>Other</option>
             </select>
+            <p className="adminHelpText">
+              Helps you remember where this file belongs.
+            </p>
           </div>
         </div>
 
-        <div className="field">
-          <label htmlFor="mediaAltText">Alt text</label>
-          <input
-            id="mediaAltText"
-            value={form.altText}
-            onChange={(event) => updateField("altText", event.target.value)}
-            placeholder="Describe the image for accessibility"
-          />
-        </div>
+        <AdminFormField
+          id="mediaAltText"
+          label="Alt text"
+          value={form.altText}
+          onChange={(value) => updateField("altText", value)}
+          placeholder="Describe the image for accessibility"
+        />
 
         <div className="field">
           <label htmlFor="mediaFile">File</label>
@@ -239,42 +240,35 @@ export function MediaClient() {
             onChange={(event) => setFile(event.target.files?.[0] ?? null)}
             required
           />
+          <p className="adminHelpText">
+            Accepted: images, videos, and PDFs. Large files may take longer to upload.
+          </p>
         </div>
 
-        {error && (
-          <p style={{ margin: 0, color: "#8a1f1f", fontWeight: 800 }}>
-            {error}
-          </p>
-        )}
+        {error && <p className="adminErrorText">{error}</p>}
 
-        <button
-          className="btn btnPrimary"
-          type="submit"
-          disabled={saving || !hasFirebaseConfig}
-        >
-          {saving ? "Uploading..." : "Upload Media"}
-        </button>
+        <div className="adminSaveBar">
+          <span>Uploaded files become available to copy and reuse below.</span>
+          <button
+            className="btn btnPrimary"
+            type="submit"
+            disabled={saving || !hasFirebaseConfig}
+          >
+            {saving ? "Uploading..." : "Upload Media"}
+          </button>
+        </div>
       </form>
 
       <div className="adminCard">
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            gap: 18,
-            alignItems: "end",
-            marginBottom: 18,
-          }}
-        >
-          <div className="field" style={{ flex: 1 }}>
-            <label htmlFor="mediaSearch">Search media</label>
-            <input
-              id="mediaSearch"
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search title, filename, usage, alt text..."
-            />
-          </div>
+        <div className="adminSearchBar" style={{ marginBottom: 18 }}>
+          <AdminFormField
+            id="mediaSearch"
+            label="Search media"
+            value={search}
+            onChange={setSearch}
+            placeholder="Search title, filename, usage, alt text..."
+            help="Filters the library below without changing files."
+          />
         </div>
 
         {loading ? (

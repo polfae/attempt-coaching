@@ -229,6 +229,11 @@ export const adminLinks = [
     description: "View newsletter signups and copy email lists.",
   },
   {
+    href: "/admin/analytics",
+    label: "Analytics",
+    description: "Review visitors, page views, sources, bounce rate, and devices.",
+  },
+  {
     href: "/admin/settings",
     label: "Settings",
     description: "Edit site name, contact links, footer, and default SEO.",

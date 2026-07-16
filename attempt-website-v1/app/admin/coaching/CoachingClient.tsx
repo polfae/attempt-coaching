@@ -6,6 +6,7 @@ import {
   getCoachingContent,
   updateCoachingContent,
 } from "@/lib/firestore";
+import { AdminFormField, AdminSectionHeader } from "@/components/AdminFormField";
 
 const fallbackCoachingContent: CoachingContent = {
   heroKicker: "Attempt Coaching",
@@ -229,67 +230,44 @@ export function CoachingClient() {
 
   return (
     <form className="form" onSubmit={onSubmit}>
-      <div className="adminCard">
-        <h3 style={{ margin: 0, color: "#16181d" }}>Coaching page content</h3>
-        <p style={{ marginBottom: 0 }}>
+      <div className="adminCard adminCardHeader">
+        <h3>Coaching page content</h3>
+        <p>
           Edit the main copy for the public coaching page.
         </p>
 
-        {error && (
-          <p
-            style={{
-              marginTop: 14,
-              color: "#8a1f1f",
-              fontWeight: 800,
-            }}
-          >
-            {error}
-          </p>
-        )}
+        {error && <p className="adminErrorText">{error}</p>}
       </div>
 
       {sections.map((section) => (
         <div className="adminCard form" key={section.title}>
-          <h3 style={{ margin: 0, color: "#16181d" }}>{section.title}</h3>
+          <AdminSectionHeader
+            title={section.title}
+            description="These fields control one section on the public coaching page."
+          />
 
           <div className="grid2">
             {section.fields.map((field) => (
-              <div className="field" key={String(field.key)}>
-                <label htmlFor={String(field.key)}>{field.label}</label>
-
-                {field.type === "textarea" ? (
-                  <textarea
-                    id={String(field.key)}
-                    value={String(safeForm[field.key] ?? "")}
-                    onChange={(event) =>
-                      updateField(field.key, event.target.value)
-                    }
-                  />
-                ) : (
-                  <input
-                    id={String(field.key)}
-                    value={String(safeForm[field.key] ?? "")}
-                    onChange={(event) =>
-                      updateField(field.key, event.target.value)
-                    }
-                  />
-                )}
-              </div>
+              <AdminFormField
+                key={String(field.key)}
+                id={String(field.key)}
+                label={field.label}
+                type={field.type === "textarea" ? "textarea" : "input"}
+                value={String(safeForm[field.key] ?? "")}
+                onChange={(value) => updateField(field.key, value)}
+              />
             ))}
           </div>
         </div>
       ))}
 
-      <div className="adminCard">
-        <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-          <button className="btn btnPrimary" type="submit" disabled={saving}>
-            {saving ? "Saving..." : "Save Coaching Page"}
-          </button>
+      <div className="adminCard adminSaveBar">
+        <span>Save when the public coaching page copy is ready.</span>
+        <button className="btn btnPrimary" type="submit" disabled={saving}>
+          {saving ? "Saving..." : "Save Coaching Page"}
+        </button>
 
-          {saved && (
-            <span style={{ color: "#006b8f", fontWeight: 800 }}>Saved</span>
-          )}
-        </div>
+        {saved && <span className="adminSaveStatus">Saved</span>}
       </div>
     </form>
   );
