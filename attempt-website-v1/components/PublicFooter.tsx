@@ -8,6 +8,13 @@ import { defaultSiteSettings } from "@/lib/firestore";
 import type { SiteSettings } from "@/lib/firestore";
 import { Logo } from "./Logo";
 
+const footerExploreLinks = [
+  { href: "/coaching", label: "Coaching" },
+  { href: "/programs", label: "Programs" },
+  { href: "/app", label: "Attempt App" },
+  { href: "/about", label: "About" },
+];
+
 export function PublicFooter({ settings }: { settings?: SiteSettings }) {
   const router = useRouter();
   const year = new Date().getFullYear();
@@ -24,23 +31,58 @@ export function PublicFooter({ settings }: { settings?: SiteSettings }) {
   return (
     <footer className="footer">
       <div className="container">
-        <div className="footerTop">
+        <div className="footerCta">
           <div>
+            <span className="kicker">Ready when you are</span>
+            <h2>Train with structure. Compete with a plan.</h2>
+          </div>
+
+          <div className="footerCtaActions">
+            <Link className="btn btnPrimary" href="/apply">
+              Apply for Coaching
+            </Link>
+            <Link className="btn btnGhost" href="/contact">
+              Ask a Question
+            </Link>
+          </div>
+        </div>
+
+        <div className="footerTop">
+          <div className="footerBrand">
             <Logo />
 
-            <p style={{ maxWidth: 460 }}>
+            <p>
               {safeSettings.footerText ||
                 "Premium weightlifting coaching supported by a professional meet-day competition tool."}
             </p>
 
-            {(safeSettings.contactEmail || safeSettings.instagramUrl) && (
-              <div className="footerLinks" style={{ marginTop: 18 }}>
-                {safeSettings.contactEmail && (
-                  <a href={`mailto:${safeSettings.contactEmail}`}>
-                    {safeSettings.contactEmail}
-                  </a>
-                )}
+            <div className="footerSignals">
+              <span>Weightlifting only</span>
+              <span>Coach-led</span>
+              <span>Meet-day ready</span>
+            </div>
+          </div>
 
+          <div className="footerColumns">
+            <div>
+              <h3>Explore</h3>
+              <div className="footerLinks">
+                {footerExploreLinks.map((link) => (
+                  <Link key={link.href} href={link.href}>
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <h3>Start</h3>
+              <div className="footerLinks">
+                <Link href="/apply">Apply</Link>
+                <Link href="/contact">Contact</Link>
+                {safeSettings.contactEmail && (
+                  <a href={`mailto:${safeSettings.contactEmail}`}>Email</a>
+                )}
                 {safeSettings.instagramUrl && (
                   <a
                     href={safeSettings.instagramUrl}
@@ -51,25 +93,22 @@ export function PublicFooter({ settings }: { settings?: SiteSettings }) {
                   </a>
                 )}
               </div>
-            )}
-          </div>
-
-          <div className="footerLinks">
-            {navLinks
-              .filter((link) => link.href !== "/contact")
-              .map((link) => (
-                <Link key={link.href} href={link.href}>
-                  {link.label}
-                </Link>
-              ))}
-
-            <Link href="/contact">Contact</Link>
+            </div>
           </div>
         </div>
 
-        <button className="copyright" onClick={goToAdmin}>
-          © {year} {safeSettings.siteName || "Attempt"}
-        </button>
+        <div className="footerBottom">
+          <button className="copyright" onClick={goToAdmin}>
+            © {year} {safeSettings.siteName || "Attempt"}
+          </button>
+          <div className="footerUtility">
+            {navLinks.slice(0, 3).map((link) => (
+              <Link key={link.href} href={link.href}>
+                {link.label}
+              </Link>
+            ))}
+          </div>
+        </div>
       </div>
     </footer>
   );

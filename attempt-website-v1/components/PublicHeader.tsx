@@ -22,67 +22,69 @@ export function PublicHeader() {
 
   return (
     <header className="header">
-      <div className="container nav">
-        <Logo />
+      <div className="container">
+        <div className="nav">
+          <div className="headerBrand">
+            <Logo />
+            <span>Weightlifting coaching</span>
+          </div>
 
-        <nav className="navLinks" aria-label="Primary navigation">
-          {navLinks.map((link) => {
-            const isActive = isCurrent(link.href);
+          <nav className="navLinks" aria-label="Primary navigation">
+            {navLinks.map((link) => {
+              const isActive = isCurrent(link.href);
 
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                aria-current={isActive ? "page" : undefined}
-                style={isActive ? { opacity: 1, color: "white" } : undefined}
-              >
-                {link.label}
-              </Link>
-            );
-          })}
-        </nav>
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  aria-current={isActive ? "page" : undefined}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
+          </nav>
 
-        <Link className="btn btnPrimary headerCta" href="/apply">
-          Apply
-        </Link>
-
-        <button
-          className="menuButton"
-          type="button"
-          aria-label={menuOpen ? "Close navigation" : "Open navigation"}
-          aria-expanded={menuOpen}
-          onClick={() => setMenuOpen((current) => !current)}
-        >
-          <span className="menuButtonLabel">Menu</span>
-          <span className="menuIcon" aria-hidden="true">
-            <span />
-            <span />
-            <span />
-          </span>
-        </button>
+          <button
+            className="menuButton"
+            type="button"
+            aria-label={menuOpen ? "Close navigation" : "Open navigation"}
+            aria-expanded={menuOpen}
+            onClick={() => setMenuOpen((current) => !current)}
+          >
+            <span className="menuButtonLabel">Menu</span>
+            <span className="menuIcon" aria-hidden="true">
+              <span />
+              <span />
+              <span />
+            </span>
+          </button>
+        </div>
       </div>
 
       {menuOpen && (
-        <nav className="mobileNavPanel" aria-label="Mobile navigation">
-          {navLinks.map((link) => {
-            const isActive = isCurrent(link.href);
+        <div className="container">
+          <nav className="mobileNavPanel" aria-label="Mobile navigation">
+            {navLinks.map((link) => {
+              const isActive = isCurrent(link.href);
 
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                aria-current={isActive ? "page" : undefined}
-                onClick={closeMenu}
-              >
-                {link.label}
-              </Link>
-            );
-          })}
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  aria-current={isActive ? "page" : undefined}
+                  onClick={closeMenu}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
 
-          <Link href="/apply" onClick={closeMenu}>
-            Apply for Coaching
-          </Link>
-        </nav>
+            <Link href="/apply" onClick={closeMenu}>
+              Apply for Coaching
+            </Link>
+          </nav>
+        </div>
       )}
     </header>
   );
