@@ -55,11 +55,13 @@ export function PublicFooter({ settings }: { settings?: SiteSettings }) {
           </div>
 
           <div className="footerLinks">
-            {navLinks.map((link) => (
-              <Link key={link.href} href={link.href}>
-                {link.label}
-              </Link>
-            ))}
+            {navLinks
+              .filter((link) => link.href !== "/contact")
+              .map((link) => (
+                <Link key={link.href} href={link.href}>
+                  {link.label}
+                </Link>
+              ))}
 
             <Link href="/contact">Contact</Link>
           </div>

@@ -992,7 +992,7 @@ select:focus {
   }
 
   .menuButton::before {
-    content: "â˜°";
+    content: "Ã¢ËœÂ°";
     font-size: 18px;
     line-height: 1;
   }
@@ -1021,5 +1021,197 @@ select:focus {
 
   .adminTopActions {
     grid-template-columns: 1fr;
+  }
+}
+
+/* -------------------------------------------------------
+   Attempt mobile polish pass 2
+------------------------------------------------------- */
+
+.menuIcon {
+  width: 18px;
+  height: 14px;
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.menuIcon span {
+  display: block;
+  width: 100%;
+  height: 2px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.adminActionButton {
+  background: #ffffff;
+  color: #16181d;
+  border-color: #d9dde6;
+  box-shadow: 0 4px 14px rgba(20, 20, 40, 0.05);
+}
+
+.adminActionButton:hover {
+  background: #f1f3f7;
+  border-color: #c7ccd7;
+}
+
+@media (max-width: 860px) {
+  .hero {
+    padding: 46px 0 36px;
+  }
+
+  .heroGrid {
+    gap: 22px;
+  }
+
+  .section {
+    padding: 42px 0;
+  }
+
+  .sectionHeader {
+    margin-bottom: 20px;
+  }
+
+  .sectionHeader p {
+    margin-top: 10px;
+  }
+
+  .grid2,
+  .grid3,
+  .split {
+    gap: 12px;
+  }
+
+  .card {
+    padding: 19px;
+    border-radius: 20px;
+  }
+
+  .card p {
+    margin-top: 9px;
+  }
+
+  .panel {
+    padding: 19px;
+    border-radius: 21px;
+  }
+
+  .footer {
+    padding: 34px 0 20px;
+  }
+
+  .footerTop {
+    margin-bottom: 22px;
+  }
+
+  .footerTop > div:first-child p {
+    margin-top: 14px;
+    margin-bottom: 0;
+  }
+
+  .footerLinks {
+    margin-top: 18px;
+    gap: 8px;
+  }
+
+  .footerLinks a {
+    min-height: 36px;
+    padding: 0 11px;
+    font-size: 14px;
+  }
+
+  .adminSidebar {
+    padding: 14px 16px 10px;
+  }
+
+  .adminSidebar nav {
+    margin-top: 12px;
+  }
+
+  .adminMain {
+    padding: 18px 16px 30px;
+  }
+
+  .adminTop {
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+
+  .adminTopTitle {
+    min-width: 0;
+  }
+
+  .adminTop h1 {
+    font-size: clamp(32px, 10vw, 44px);
+    line-height: 1;
+    letter-spacing: -0.05em;
+    overflow-wrap: anywhere;
+  }
+
+  .adminTop .kicker {
+    margin-bottom: 7px;
+  }
+
+  .adminTopActions {
+    display: flex;
+    width: 100%;
+    gap: 8px;
+  }
+
+  .adminTopActions .btn {
+    flex: 1 1 0;
+    width: auto;
+    min-height: 40px;
+    padding: 0 12px;
+    color: #16181d;
+    background: #ffffff;
+    border-color: #d9dde6;
+  }
+
+  .adminCard {
+    padding: 16px;
+    border-radius: 18px;
+  }
+
+  .adminCard h3 {
+    font-size: 22px;
+  }
+}
+
+@media (max-width: 420px) {
+  .menuButton {
+    gap: 0;
+    padding: 0 10px;
+  }
+
+  .menuButtonLabel {
+    display: none;
+  }
+
+  .menuIcon {
+    display: flex;
+  }
+
+  .menuButton::before {
+    content: none;
+  }
+
+  .hero {
+    padding: 38px 0 32px;
+  }
+
+  .section {
+    padding: 36px 0;
+  }
+
+  .card,
+  .panel {
+    padding: 17px;
+    border-radius: 18px;
+  }
+
+  .adminTopActions {
+    grid-template-columns: none;
   }
 }

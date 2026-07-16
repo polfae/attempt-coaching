@@ -53,7 +53,12 @@ export function PublicHeader() {
           aria-expanded={menuOpen}
           onClick={() => setMenuOpen((current) => !current)}
         >
-          Menu
+          <span className="menuButtonLabel">Menu</span>
+          <span className="menuIcon" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+          </span>
         </button>
       </div>
 

@@ -91,16 +91,20 @@ export function AdminShell({
 
       <main className="adminMain">
         <div className="adminTop">
-          <div>
+          <div className="adminTopTitle">
             <div className="kicker">Attempt Admin</div>
             <h1>{title}</h1>
           </div>
 
           <div className="adminTopActions">
-            <Link className="btn" href="/" target="_blank">
+            <Link className="btn adminActionButton" href="/" target="_blank">
               View site
             </Link>
-            <button className="btn" onClick={logout}>
+            <button
+              className="btn adminActionButton"
+              type="button"
+              onClick={logout}
+            >
               Logout
             </button>
           </div>
