@@ -1,13 +1,20 @@
+import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { PublicLayout } from "@/components/PublicLayout";
 import { Section } from "@/components/Section";
 import { CardGrid } from "@/components/CardGrid";
 import { NewsletterForm } from "@/components/NewsletterForm";
 import {
+  coachingProcess,
   coachingFeatures,
   coachingFor,
+  heroSignals,
   problems,
   samplePrograms,
+  testimonials as fallbackTestimonials,
+  trustPoints,
+  trustStats,
 } from "@/lib/content";
 import {
   getHomepageContent,
@@ -15,19 +22,53 @@ import {
   getVisibleTestimonials,
 } from "@/lib/firestore";
 
+export async function generateMetadata(): Promise<Metadata> {
+  const content = await getHomepageContent();
+  const title = content.seoTitle || "Attempt Coaching | Weightlifting Coaching";
+  const description =
+    content.seoDescription ||
+    "Premium weightlifting coaching with structured programming, technical feedback, competition preparation, and the Attempt app.";
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: "website",
+      images: [
+        {
+          url: "/attempt-hero-weightlifting.png",
+          width: 1024,
+          height: 1536,
+          alt: "Attempt Coaching weightlifting hero image",
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: ["/attempt-hero-weightlifting.png"],
+    },
+  };
+}
+
 export default async function HomePage() {
   const content = await getHomepageContent();
   const testimonials = (await getVisibleTestimonials()) as any[];
   const programs = (await getVisiblePrograms()) as any[];
+  const availableTestimonials =
+    testimonials.length > 0 ? testimonials : fallbackTestimonials;
 
-  const featuredTestimonials = testimonials
+  const featuredTestimonials = availableTestimonials
     .filter((testimonial) => testimonial.featured === true)
     .slice(0, 2);
 
   const testimonialsToShow =
     featuredTestimonials.length > 0
       ? featuredTestimonials
-      : testimonials.slice(0, 2);
+      : availableTestimonials.slice(0, 2);
 
   const featuredPrograms = programs
     .filter((program) => program.featured === true)
@@ -66,17 +107,41 @@ export default async function HomePage() {
                 {content.heroSecondaryCtaLabel}
               </Link>
             </div>
+
+            <div className="heroSignals" aria-label="Attempt coaching focus">
+              {heroSignals.map((signal) => (
+                <span key={signal}>{signal}</span>
+              ))}
+            </div>
           </div>
 
-          <div
-            className="visualCard"
-            aria-label="Weightlifting visual placeholder"
-          >
+          <div className="visualCard" aria-label="Attempt weightlifting coaching">
+            <Image
+              className="heroImage"
+              src="/attempt-hero-weightlifting.png"
+              alt="Weightlifter preparing for a lift while a coach observes in a training hall"
+              width={1024}
+              height={1536}
+              priority
+              sizes="(max-width: 860px) 100vw, 46vw"
+            />
+
             <div className="visualText">
               <strong>{content.heroVisualTitle}</strong>
               <span>{content.heroVisualText}</span>
             </div>
           </div>
+        </div>
+      </section>
+
+      <section className="trustStrip" aria-label="Attempt coaching standards">
+        <div className="container trustStripGrid">
+          {trustStats.map(([title, text]) => (
+            <div className="trustStat" key={title}>
+              <strong>{title}</strong>
+              <span>{text}</span>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -113,6 +178,22 @@ export default async function HomePage() {
             <li key={problem}>{problem}</li>
           ))}
         </ul>
+      </Section>
+
+      <Section
+        kicker="The process"
+        title="From application to platform, the work stays connected."
+        text="Good coaching is not just writing sessions. It is seeing the pattern, choosing the right priority, and keeping training pointed at the result that matters."
+      >
+        <div className="processGrid">
+          {coachingProcess.map(([title, text], index) => (
+            <article className="processCard" key={title}>
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <h3>{title}</h3>
+              <p>{text}</p>
+            </article>
+          ))}
+        </div>
       </Section>
 
       <Section
@@ -176,8 +257,17 @@ export default async function HomePage() {
         title={content.proofTitle}
         text={content.proofText}
       >
+        <div className="trustPanel">
+          {trustPoints.map(([title, text]) => (
+            <article key={title}>
+              <h3>{title}</h3>
+              <p>{text}</p>
+            </article>
+          ))}
+        </div>
+
         {testimonialsToShow.length > 0 ? (
-          <div className="grid2">
+          <div className="grid2 proofQuotes">
             {testimonialsToShow.map((item) => (
               <article className="card" key={item.id ?? item.name}>
                 {item.featured && (

@@ -34,6 +34,18 @@ export const coachingFeatures: [string, string][] = [
   ],
 ];
 
+export const heroSignals = [
+  "Individual programming",
+  "Technical feedback",
+  "Platform strategy",
+];
+
+export const trustStats: [string, string][] = [
+  ["Weightlifting only", "No general fitness templates or random training PDFs."],
+  ["Coach-led", "Programming, feedback, peaking, and meet-day decisions stay connected."],
+  ["Application based", "Built for lifters who want a serious coaching relationship."],
+];
+
 export const problems: string[] = [
   "Training without a clear plan",
   "Repeating the same technical errors",
@@ -41,6 +53,64 @@ export const problems: string[] = [
   "Poor peaking and unclear attempt selection",
   "Bad warm-up room organization",
   "Lack of feedback between sessions",
+];
+
+export const coachingProcess: [string, string][] = [
+  [
+    "Assess",
+    "Review your training background, current lifts, goals, schedule, competition plans, and technical priorities.",
+  ],
+  [
+    "Build",
+    "Create programming around the athlete in front of us: your capacity, weak points, recovery, and season.",
+  ],
+  [
+    "Coach",
+    "Use ongoing feedback, video review, and training updates to adjust the plan before small issues become patterns.",
+  ],
+  [
+    "Compete",
+    "Prepare warm-ups, attempts, peaking, and platform decisions so meet day feels planned instead of improvised.",
+  ],
+];
+
+export const trustPoints: [string, string][] = [
+  [
+    "Specific to Olympic weightlifting",
+    "Attempt is built around the snatch, clean & jerk, squats, pulls, technical development, and competition performance.",
+  ],
+  [
+    "More than programming",
+    "The plan includes communication, feedback, adjustments, and competition strategy, not just a spreadsheet.",
+  ],
+  [
+    "Built for serious progress",
+    "The goal is better training decisions over time: clearer priorities, better execution, and more confidence on the platform.",
+  ],
+];
+
+export const aboutPrinciples: [string, string][] = [
+  [
+    "The athlete comes before the template",
+    "Programming should respond to the person doing the work: schedule, recovery, experience, goals, and technical needs.",
+  ],
+  [
+    "Technique and training belong together",
+    "The lifts are not separate from the program. Technical priorities should shape exercise selection, loading, and progression.",
+  ],
+  [
+    "Competition is part of the process",
+    "Warm-ups, attempts, peaking, and platform decisions are trained and prepared, not improvised at the meet.",
+  ],
+];
+
+export const aboutStandards = [
+  "Olympic weightlifting only",
+  "Clear communication",
+  "Video-informed technical feedback",
+  "Competition preparation",
+  "Long-term athlete development",
+  "Application-based coaching fit",
 ];
 
 export const coachingFor: string[] = [

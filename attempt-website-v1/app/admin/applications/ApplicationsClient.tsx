@@ -11,6 +11,9 @@ type Application = {
   age?: string;
   bodyweight?: string;
   trainingAge?: string;
+  coachingPriority?: string;
+  readiness?: string;
+  nextCompetition?: string;
   bestSnatch?: string;
   bestCleanJerk?: string;
   bestTotal?: string;
@@ -32,7 +35,14 @@ type Application = {
   };
 };
 
-const statuses = ["new", "reviewed", "contacted", "accepted", "rejected"];
+const statuses = [
+  "new",
+  "reviewed",
+  "contacted",
+  "accepted",
+  "waitlist",
+  "rejected",
+];
 
 function formatDate(createdAt: Application["createdAt"]) {
   if (!createdAt?.seconds) return "—";
@@ -92,6 +102,8 @@ export function ApplicationsClient() {
         item.name,
         item.email,
         item.country,
+        item.coachingPriority,
+        item.readiness,
         item.goals,
         item.whyAttempt,
         item.currentTraining,
@@ -218,6 +230,16 @@ export function ApplicationsClient() {
                       <span style={{ color: "#656b78" }}>
                         {item.country || "—"}
                       </span>
+                      {(item.coachingPriority || item.readiness) && (
+                        <>
+                          <br />
+                          <span style={{ color: "#656b78" }}>
+                            {[item.coachingPriority, item.readiness]
+                              .filter(Boolean)
+                              .join(" · ")}
+                          </span>
+                        </>
+                      )}
                     </td>
                     <td>
                       <span className="status">{item.status ?? "new"}</span>
@@ -264,9 +286,49 @@ export function ApplicationsClient() {
               <Field label="Age" value={selected.age} />
               <Field label="Bodyweight" value={selected.bodyweight} />
               <Field label="Training age" value={selected.trainingAge} />
+              <Field
+                label="Coaching priority"
+                value={selected.coachingPriority}
+              />
+              <Field label="Readiness" value={selected.readiness} />
+              <Field label="Next competition" value={selected.nextCompetition} />
               <Field label="Best snatch" value={selected.bestSnatch} />
               <Field label="Best clean & jerk" value={selected.bestCleanJerk} />
               <Field label="Best total" value={selected.bestTotal} />
+            </div>
+
+            <div
+              style={{
+                marginBottom: 24,
+                padding: 18,
+                border: "1px solid #eceef3",
+                borderRadius: 18,
+                background: "#f8f9fc",
+              }}
+            >
+              <h3 style={{ margin: 0, color: "#16181d" }}>Triage summary</h3>
+              <p style={{ margin: "8px 0 0" }}>
+                {[
+                  selected.coachingPriority &&
+                    `Priority: ${selected.coachingPriority}`,
+                  selected.readiness && `Readiness: ${selected.readiness}`,
+                  selected.nextCompetition &&
+                    `Next competition: ${selected.nextCompetition}`,
+                ]
+                  .filter(Boolean)
+                  .join(" · ") || "No triage fields provided yet."}
+              </p>
+
+              {selected.email && (
+                <div className="actions" style={{ marginTop: 16 }}>
+                  <a
+                    className="btn btnPrimary"
+                    href={`mailto:${selected.email}?subject=Attempt Coaching application`}
+                  >
+                    Email Applicant
+                  </a>
+                </div>
+              )}
             </div>
 
             <div style={{ display: "grid", gap: 18 }}>

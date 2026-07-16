@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { PublicLayout } from "@/components/PublicLayout";
 import { getVisiblePrograms } from "@/lib/firestore";
 
@@ -41,12 +42,12 @@ export default async function ProgramsPage() {
             are not ready for full Attempt Coaching yet.
           </p>
           <div className="actions">
-            <a className="btn btnPrimary" href="/apply">
+            <Link className="btn btnPrimary" href="/apply">
               Apply for Coaching
-            </a>
-            <a className="btn btnGhost" href="/coaching">
+            </Link>
+            <Link className="btn btnGhost" href="/coaching">
               See Coaching First
-            </a>
+            </Link>
           </div>
         </div>
       </section>
@@ -127,9 +128,9 @@ export default async function ProgramsPage() {
                   actual training.
                 </p>
                 <div className="actions">
-                  <a className="btn btnPrimary" href="/apply">
+                  <Link className="btn btnPrimary" href="/apply">
                     Apply for Coaching
-                  </a>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -172,15 +173,15 @@ function ProgramCard({ program }: { program: any }) {
 
       {program.productLink ? (
         <div className="actions">
-          <a className="btn btnPrimary" href={program.productLink}>
-            View Program
-          </a>
+          <Link className="btn btnPrimary" href={`/programs/${program.slug}`}>
+            View Details
+          </Link>
         </div>
       ) : (
         <div className="actions">
-          <a className="btn btnGhost" href="/contact">
-            Ask About Program
-          </a>
+          <Link className="btn btnGhost" href={`/programs/${program.slug}`}>
+            View Details
+          </Link>
         </div>
       )}
     </article>

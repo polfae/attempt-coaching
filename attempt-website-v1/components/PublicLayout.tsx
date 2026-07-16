@@ -5,12 +5,13 @@ import { getSiteSettings } from "@/lib/firestore";
 
 export async function PublicLayout({ children }: { children: ReactNode }) {
   const settings = await getSiteSettings();
+  const { updatedAt, ...footerSettings } = settings;
 
   return (
     <>
       <PublicHeader />
       <main>{children}</main>
-      <PublicFooter settings={settings} />
+      <PublicFooter settings={footerSettings} />
     </>
   );
 }

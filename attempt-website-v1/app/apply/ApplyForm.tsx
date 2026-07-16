@@ -9,14 +9,17 @@ const fields = [
   ["country", "Country", "text", true],
   ["age", "Age", "number", false],
   ["bodyweight", "Bodyweight", "text", false],
+] as const;
+
+const trainingFields = [
   ["trainingAge", "Training age", "text", false],
   ["bestSnatch", "Best snatch", "text", false],
   ["bestCleanJerk", "Best clean & jerk", "text", false],
   ["bestTotal", "Best total", "text", false],
+  ["nextCompetition", "Next competition", "text", false],
 ] as const;
 
 const textareas = [
-  ["competitionExperience", "Competition experience"],
   ["currentTraining", "Current coach or training setup"],
   ["goals", "Main goals"],
   ["injuries", "Injuries or limitations"],
@@ -52,6 +55,9 @@ export function ApplyForm() {
         age: data.age,
         bodyweight: data.bodyweight,
         trainingAge: data.trainingAge,
+        coachingPriority: data.coachingPriority,
+        readiness: data.readiness,
+        nextCompetition: data.nextCompetition,
         bestSnatch: data.bestSnatch,
         bestCleanJerk: data.bestCleanJerk,
         bestTotal: data.bestTotal,
@@ -80,8 +86,9 @@ export function ApplyForm() {
       <div className="panel">
         <h2>Application received.</h2>
         <p>
-          I’ll review your answers and contact you if Attempt Coaching seems
-          like a good fit.
+          I’ll review your training background, goals, and coaching fit. If
+          Attempt Coaching looks like the right next step, I’ll contact you with
+          the next move.
         </p>
       </div>
     );
@@ -89,21 +96,88 @@ export function ApplyForm() {
 
   return (
     <form className="panel form applyForm" onSubmit={onSubmit}>
-      <div className="grid3">
-        {fields.map(([name, label, type, required]) => (
+      <div>
+        <h2>Coaching application.</h2>
+        <p>
+          Clear answers help me understand whether coaching can genuinely help
+          you right now.
+        </p>
+      </div>
+
+      <div className="applySection">
+        <div>
+          <div className="kicker">Step 01</div>
+          <h3>Your details</h3>
+        </div>
+
+        <div className="grid3">
+          {fields.map(([name, label, type, required]) => (
+            <div className="field" key={name}>
+              <label htmlFor={name}>{label}</label>
+              <input id={name} name={name} type={type} required={required} />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="applySection">
+        <div>
+          <div className="kicker">Step 02</div>
+          <h3>Your lifting</h3>
+        </div>
+
+        <div className="grid3">
+          {trainingFields.map(([name, label, type, required]) => (
+            <div className="field" key={name}>
+              <label htmlFor={name}>{label}</label>
+              <input id={name} name={name} type={type} required={required} />
+            </div>
+          ))}
+        </div>
+
+        <div className="grid2">
+          <div className="field">
+            <label htmlFor="coachingPriority">Main coaching priority</label>
+            <select id="coachingPriority" name="coachingPriority">
+              <option value="">Choose one</option>
+              <option>Technical feedback</option>
+              <option>Individual programming</option>
+              <option>Competition preparation</option>
+              <option>Long-term development</option>
+              <option>All of the above</option>
+            </select>
+          </div>
+
+          <div className="field">
+            <label htmlFor="readiness">Readiness</label>
+            <select id="readiness" name="readiness">
+              <option value="">Choose one</option>
+              <option>Ready to start now</option>
+              <option>Preparing for a future start</option>
+              <option>Still deciding</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="field">
+          <label htmlFor="competitionExperience">Competition experience</label>
+          <textarea id="competitionExperience" name="competitionExperience" />
+        </div>
+      </div>
+
+      <div className="applySection">
+        <div>
+          <div className="kicker">Step 03</div>
+          <h3>Goals and fit</h3>
+        </div>
+
+        {textareas.map(([name, label]) => (
           <div className="field" key={name}>
             <label htmlFor={name}>{label}</label>
-            <input id={name} name={name} type={type} required={required} />
+            <textarea id={name} name={name} />
           </div>
         ))}
       </div>
-
-      {textareas.map(([name, label]) => (
-        <div className="field" key={name}>
-          <label htmlFor={name}>{label}</label>
-          <textarea id={name} name={name} />
-        </div>
-      ))}
 
       <label className="checkboxRow">
         <input name="consent" type="checkbox" required />

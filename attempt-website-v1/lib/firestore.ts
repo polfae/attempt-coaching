@@ -22,6 +22,9 @@ export type CoachingApplication = {
   age?: string;
   bodyweight?: string;
   trainingAge?: string;
+  coachingPriority?: string;
+  readiness?: string;
+  nextCompetition?: string;
   bestSnatch?: string;
   bestCleanJerk?: string;
   bestTotal?: string;
@@ -44,6 +47,7 @@ export type Program = {
   description: string;
   level: string;
   duration: string;
+  days?: string;
   daysPerWeek: string;
   goal: string;
   price: string;
@@ -64,6 +68,20 @@ export type Testimonial = {
   photoUrl?: string;
   visible: boolean;
   featured: boolean;
+  createdAt?: unknown;
+  updatedAt?: unknown;
+};
+
+export type MediaAsset = {
+  id?: string;
+  title: string;
+  altText?: string;
+  usage?: string;
+  fileName: string;
+  fileType: string;
+  size: number;
+  url: string;
+  storagePath: string;
   createdAt?: unknown;
   updatedAt?: unknown;
 };
@@ -281,9 +299,9 @@ export const defaultHomepageContent: HomepageContent = {
     "Premium weightlifting coaching with structured programming, technical feedback, competition preparation, and the Attempt app.",
   heroKicker: "Attempt Coaching",
   heroHeadline:
-    "Premium weightlifting coaching for athletes who want more than just a program.",
+    "Weightlifting coaching for lifters who want a real plan.",
   heroText:
-    "Attempt Coaching combines structured programming, technical feedback, competition preparation, and the Attempt app to help lifters train with purpose and perform better on the platform.",
+    "Attempt connects individual programming, technical feedback, competition preparation, and meet-day strategy so your training has direction from the first warm-up to the platform.",
   heroPrimaryCtaLabel: "Apply for Coaching",
   heroPrimaryCtaLink: "/apply",
   heroSecondaryCtaLabel: "See How Coaching Works",
@@ -292,20 +310,20 @@ export const defaultHomepageContent: HomepageContent = {
   heroVisualText: "Compete with a plan.",
 
   brandKicker: "Built for weightlifters",
-  brandTitle: "Coaching first. Everything else supports it.",
+  brandTitle: "A coaching system, not another spreadsheet.",
   brandText:
-    "Attempt is a coaching-first weightlifting brand. The app, programs, and future products all support the same goal: helping lifters train smarter and compete better.",
+    "The work starts with the athlete: how you move, how you recover, what you are preparing for, and what decisions need to improve. The app, programs, and future tools all support that same coaching process.",
 
   problemKicker: "The problem",
   problemTitle:
-    "Most lifters do not need more random training. They need direction.",
+    "Most lifters do not need more random training. They need better decisions.",
   problemText:
-    "Progress becomes harder when programming, technique, and competition decisions are disconnected.",
+    "Progress slows when programming, technique, recovery, and competition strategy are treated as separate problems. Attempt brings them back into one system.",
 
   coachingKicker: "The offer",
-  coachingTitle: "Coaching built around the athlete, not just the program.",
+  coachingTitle: "Coaching built around the athlete in front of me.",
   coachingText:
-    "A premium coaching relationship for lifters who want a clearer process from training hall to competition platform.",
+    "A premium online coaching relationship for lifters who want structure, feedback, and a clearer process from training hall to competition platform.",
 
   appKicker: "Attempt app",
   appTitle: "Meet day, organized.",
@@ -322,9 +340,9 @@ export const defaultHomepageContent: HomepageContent = {
     "Attempt Coaching is for lifters who want structure, accountability, and a better competition process.",
 
   proofKicker: "Proof",
-  proofTitle: "Built from the platform, not generic fitness marketing.",
+  proofTitle: "Built for lifters who care about the platform.",
   proofText:
-    "Athlete feedback, coaching background, and real stories from the training process.",
+    "The coaching process is grounded in weightlifting-specific training, athlete feedback, and the practical decisions that decide competition performance.",
 
   programsKicker: "Programs",
   programsTitle: "Not ready for coaching yet? Start with a program.",
@@ -338,7 +356,7 @@ export const defaultHomepageContent: HomepageContent = {
 
   finalCtaTitle: "Ready to take your weightlifting seriously?",
   finalCtaText:
-    "Apply for coaching and start with a process built around your training, your technique, and your platform goals.",
+    "Apply for coaching and start with a process built around your training, your technique, your schedule, and your platform goals.",
   finalCtaButtonLabel: "Apply for Coaching",
   finalCtaButtonLink: "/apply",
 };
@@ -453,7 +471,7 @@ export const defaultAboutContent: AboutContent = {
   heroKicker: "About Attempt",
   heroHeadline: "Built by a coach who understands the platform.",
   heroText:
-    "Attempt exists to connect serious weightlifting coaching, better competition preparation, and practical tools for lifters.",
+    "Attempt exists to connect serious weightlifting coaching, better competition preparation, and practical tools for lifters who want clearer decisions in training and on meet day.",
   heroPrimaryCtaLabel: "Apply for Coaching",
   heroPrimaryCtaLink: "/apply",
   heroSecondaryCtaLabel: "See Coaching",
@@ -462,13 +480,13 @@ export const defaultAboutContent: AboutContent = {
   founderKicker: "Founder",
   founderTitle: "Pól Hendrikur Andreasen",
   founderText:
-    "Attempt is built from hands-on coaching experience in Olympic weightlifting, athlete development, and competition preparation.",
+    "Attempt is built around hands-on coaching in Olympic weightlifting, athlete development, and competition preparation. The goal is simple: help lifters train with more direction and compete with more clarity.",
 
   backgroundKicker: "Background",
   backgroundTitle:
     "Coaching experience from the training hall to the platform.",
   backgroundText:
-    "Use this section to describe your weightlifting background, your work as a coach, your federation experience, and your role developing athletes and systems around performance.",
+    "Use this section to describe your weightlifting background, your work as a coach, your federation experience, and your role developing athletes and systems around performance. The stronger this gets, the more trust the site will carry.",
 
   philosophyKicker: "Philosophy",
   philosophyTitle: "Coaching and competition tools belong together.",
@@ -487,10 +505,28 @@ export const defaultAboutContent: AboutContent = {
 
   finalCtaTitle: "Ready to work with Attempt?",
   finalCtaText:
-    "Apply for coaching and start with a process built around your training, your technique, and your platform goals.",
+    "Apply for coaching if you want a structured process for your training, your technique, and your platform goals.",
   finalCtaButtonLabel: "Apply for Coaching",
   finalCtaButtonLink: "/apply",
 };
+
+async function readWithFallback<T>(
+  label: string,
+  fallback: T,
+  read: (activeDb: NonNullable<typeof db>) => Promise<T>,
+): Promise<T> {
+  if (!hasFirebaseConfig || !db) return fallback;
+
+  try {
+    return await read(db);
+  } catch (error) {
+    console.warn(
+      `Unable to read ${label} from Firestore. Using fallback.`,
+      error,
+    );
+    return fallback;
+  }
+}
 
 export async function submitApplication(data: CoachingApplication) {
   if (!hasFirebaseConfig || !db) {
@@ -519,48 +555,86 @@ export async function submitNewsletter(email: string) {
 }
 
 export async function getNewsletterSignups() {
-  if (!hasFirebaseConfig || !db) return [];
+  return readWithFallback("newsletter signups", [], async (activeDb) => {
+    const snapshot = await getDocs(
+      query(
+        collection(activeDb, "newsletterSignups"),
+        orderBy("createdAt", "desc"),
+      ),
+    );
 
-  const snapshot = await getDocs(
-    query(collection(db, "newsletterSignups"), orderBy("createdAt", "desc")),
-  );
-
-  return snapshot.docs.map((item) => ({
-    id: item.id,
-    ...item.data(),
-  }));
+    return snapshot.docs.map((item) => ({
+      id: item.id,
+      ...item.data(),
+    }));
+  });
 }
 
 export async function getPrograms() {
-  if (!hasFirebaseConfig || !db) return samplePrograms;
+  return readWithFallback(
+    "programs",
+    samplePrograms as Program[],
+    async (activeDb) => {
+      const snapshot = await getDocs(
+        query(collection(activeDb, "programs"), orderBy("title")),
+      );
 
-  const snapshot = await getDocs(
-    query(collection(db, "programs"), orderBy("title")),
+      const programs = snapshot.docs.map((item) => ({
+        id: item.id,
+        ...item.data(),
+      })) as Program[];
+
+      return programs.length ? programs : samplePrograms;
+    },
   );
-
-  const programs = snapshot.docs.map((item) => ({
-    id: item.id,
-    ...item.data(),
-  })) as Program[];
-
-  return programs.length ? programs : samplePrograms;
 }
 
 export async function getVisiblePrograms() {
-  if (!hasFirebaseConfig || !db) return samplePrograms;
+  return readWithFallback(
+    "visible programs",
+    samplePrograms as Program[],
+    async (activeDb) => {
+      const snapshot = await getDocs(
+        query(
+          collection(activeDb, "programs"),
+          where("visible", "==", true),
+          orderBy("title"),
+        ),
+      );
 
-  const snapshot = await getDocs(
-    query(
-      collection(db, "programs"),
-      where("visible", "==", true),
-      orderBy("title"),
-    ),
+      return snapshot.docs.map((item) => ({
+        id: item.id,
+        ...item.data(),
+      })) as Program[];
+    },
   );
+}
 
-  return snapshot.docs.map((item) => ({
-    id: item.id,
-    ...item.data(),
-  })) as Program[];
+export async function getProgramBySlug(slug: string) {
+  const fallbackProgram =
+    (samplePrograms as Program[]).find((program) => program.slug === slug) ??
+    null;
+
+  return readWithFallback("program by slug", fallbackProgram, async (activeDb) => {
+    const snapshot = await getDocs(
+      query(
+        collection(activeDb, "programs"),
+        where("slug", "==", slug),
+        where("visible", "==", true),
+      ),
+    );
+
+    const program = snapshot.docs.map((item) => ({
+      id: item.id,
+      ...item.data(),
+    }))[0] as Program | undefined;
+
+    if (!program || program.visible === false) {
+      return fallbackProgram;
+    }
+
+    return program;
+  });
 }
 
 export async function createProgram(data: Program) {
@@ -600,33 +674,33 @@ export async function deleteProgram(id: string) {
 }
 
 export async function getTestimonials() {
-  if (!hasFirebaseConfig || !db) return [];
+  return readWithFallback("testimonials", [], async (activeDb) => {
+    const snapshot = await getDocs(
+      query(collection(activeDb, "testimonials"), orderBy("name")),
+    );
 
-  const snapshot = await getDocs(
-    query(collection(db, "testimonials"), orderBy("name")),
-  );
-
-  return snapshot.docs.map((item) => ({
-    id: item.id,
-    ...item.data(),
-  })) as Testimonial[];
+    return snapshot.docs.map((item) => ({
+      id: item.id,
+      ...item.data(),
+    })) as Testimonial[];
+  });
 }
 
 export async function getVisibleTestimonials() {
-  if (!hasFirebaseConfig || !db) return [];
+  return readWithFallback("visible testimonials", [], async (activeDb) => {
+    const snapshot = await getDocs(
+      query(
+        collection(activeDb, "testimonials"),
+        where("visible", "==", true),
+        orderBy("name"),
+      ),
+    );
 
-  const snapshot = await getDocs(
-    query(
-      collection(db, "testimonials"),
-      where("visible", "==", true),
-      orderBy("name"),
-    ),
-  );
-
-  return snapshot.docs.map((item) => ({
-    id: item.id,
-    ...item.data(),
-  })) as Testimonial[];
+    return snapshot.docs.map((item) => ({
+      id: item.id,
+      ...item.data(),
+    })) as Testimonial[];
+  });
 }
 
 export async function createTestimonial(data: Testimonial) {
@@ -668,20 +742,61 @@ export async function deleteTestimonial(id: string) {
   return deleteDoc(doc(db, "testimonials", id));
 }
 
-export async function getSiteSettings() {
-  if (!hasFirebaseConfig || !db) return defaultSiteSettings;
+export async function getMediaAssets() {
+  return readWithFallback("media assets", [], async (activeDb) => {
+    const snapshot = await getDocs(
+      query(collection(activeDb, "media"), orderBy("createdAt", "desc")),
+    );
 
-  const reference = doc(db, "siteSettings", "main");
-  const snapshot = await getDoc(reference);
+    return snapshot.docs.map((item) => ({
+      id: item.id,
+      ...item.data(),
+    })) as MediaAsset[];
+  });
+}
 
-  if (!snapshot.exists()) {
-    return defaultSiteSettings;
+export async function createMediaAsset(data: MediaAsset) {
+  if (!hasFirebaseConfig || !db) {
+    console.info("Firebase not configured. Media asset payload:", data);
+    return { offline: true };
   }
 
-  return {
-    ...defaultSiteSettings,
-    ...snapshot.data(),
-  } as SiteSettings;
+  const { id, ...assetData } = data;
+
+  return addDoc(collection(db, "media"), {
+    ...assetData,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function deleteMediaAsset(id: string) {
+  if (!hasFirebaseConfig || !db) {
+    console.info("Firebase not configured. Media asset delete:", id);
+    return { offline: true };
+  }
+
+  return deleteDoc(doc(db, "media", id));
+}
+
+export async function getSiteSettings() {
+  return readWithFallback(
+    "site settings",
+    defaultSiteSettings,
+    async (activeDb) => {
+      const reference = doc(activeDb, "siteSettings", "main");
+      const snapshot = await getDoc(reference);
+
+      if (!snapshot.exists()) {
+        return defaultSiteSettings;
+      }
+
+      return {
+        ...defaultSiteSettings,
+        ...snapshot.data(),
+      } as SiteSettings;
+    },
+  );
 }
 
 export async function updateSiteSettings(data: SiteSettings) {
@@ -701,19 +816,23 @@ export async function updateSiteSettings(data: SiteSettings) {
 }
 
 export async function getHomepageContent() {
-  if (!hasFirebaseConfig || !db) return defaultHomepageContent;
+  return readWithFallback(
+    "homepage content",
+    defaultHomepageContent,
+    async (activeDb) => {
+      const reference = doc(activeDb, "homepage", "main");
+      const snapshot = await getDoc(reference);
 
-  const reference = doc(db, "homepage", "main");
-  const snapshot = await getDoc(reference);
+      if (!snapshot.exists()) {
+        return defaultHomepageContent;
+      }
 
-  if (!snapshot.exists()) {
-    return defaultHomepageContent;
-  }
-
-  return {
-    ...defaultHomepageContent,
-    ...snapshot.data(),
-  } as HomepageContent;
+      return {
+        ...defaultHomepageContent,
+        ...snapshot.data(),
+      } as HomepageContent;
+    },
+  );
 }
 
 export async function updateHomepageContent(data: HomepageContent) {
@@ -733,19 +852,23 @@ export async function updateHomepageContent(data: HomepageContent) {
 }
 
 export async function getCoachingContent() {
-  if (!hasFirebaseConfig || !db) return defaultCoachingContent;
+  return readWithFallback(
+    "coaching content",
+    defaultCoachingContent,
+    async (activeDb) => {
+      const reference = doc(activeDb, "pages", "coaching");
+      const snapshot = await getDoc(reference);
 
-  const reference = doc(db, "pages", "coaching");
-  const snapshot = await getDoc(reference);
+      if (!snapshot.exists()) {
+        return defaultCoachingContent;
+      }
 
-  if (!snapshot.exists()) {
-    return defaultCoachingContent;
-  }
-
-  return {
-    ...defaultCoachingContent,
-    ...snapshot.data(),
-  } as CoachingContent;
+      return {
+        ...defaultCoachingContent,
+        ...snapshot.data(),
+      } as CoachingContent;
+    },
+  );
 }
 
 export async function updateCoachingContent(data: CoachingContent) {
@@ -765,19 +888,19 @@ export async function updateCoachingContent(data: CoachingContent) {
 }
 
 export async function getAppContent() {
-  if (!hasFirebaseConfig || !db) return defaultAppContent;
+  return readWithFallback("app content", defaultAppContent, async (activeDb) => {
+    const reference = doc(activeDb, "pages", "app");
+    const snapshot = await getDoc(reference);
 
-  const reference = doc(db, "pages", "app");
-  const snapshot = await getDoc(reference);
+    if (!snapshot.exists()) {
+      return defaultAppContent;
+    }
 
-  if (!snapshot.exists()) {
-    return defaultAppContent;
-  }
-
-  return {
-    ...defaultAppContent,
-    ...snapshot.data(),
-  } as AppContent;
+    return {
+      ...defaultAppContent,
+      ...snapshot.data(),
+    } as AppContent;
+  });
 }
 
 export async function updateAppContent(data: AppContent) {
@@ -797,19 +920,23 @@ export async function updateAppContent(data: AppContent) {
 }
 
 export async function getAboutContent() {
-  if (!hasFirebaseConfig || !db) return defaultAboutContent;
+  return readWithFallback(
+    "about content",
+    defaultAboutContent,
+    async (activeDb) => {
+      const reference = doc(activeDb, "pages", "about");
+      const snapshot = await getDoc(reference);
 
-  const reference = doc(db, "pages", "about");
-  const snapshot = await getDoc(reference);
+      if (!snapshot.exists()) {
+        return defaultAboutContent;
+      }
 
-  if (!snapshot.exists()) {
-    return defaultAboutContent;
-  }
-
-  return {
-    ...defaultAboutContent,
-    ...snapshot.data(),
-  } as AboutContent;
+      return {
+        ...defaultAboutContent,
+        ...snapshot.data(),
+      } as AboutContent;
+    },
+  );
 }
 
 export async function updateAboutContent(data: AboutContent) {
@@ -829,16 +956,19 @@ export async function updateAboutContent(data: AboutContent) {
 }
 
 export async function getApplications() {
-  if (!hasFirebaseConfig || !db) return [];
+  return readWithFallback("coaching applications", [], async (activeDb) => {
+    const snapshot = await getDocs(
+      query(
+        collection(activeDb, "coachingApplications"),
+        orderBy("createdAt", "desc"),
+      ),
+    );
 
-  const snapshot = await getDocs(
-    query(collection(db, "coachingApplications"), orderBy("createdAt", "desc")),
-  );
-
-  return snapshot.docs.map((item) => ({
-    id: item.id,
-    ...item.data(),
-  }));
+    return snapshot.docs.map((item) => ({
+      id: item.id,
+      ...item.data(),
+    }));
+  });
 }
 
 export async function updateApplicationStatus(

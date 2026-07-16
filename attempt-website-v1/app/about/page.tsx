@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { PublicLayout } from "@/components/PublicLayout";
+import { aboutPrinciples, aboutStandards } from "@/lib/content";
 import { getAboutContent, getSiteSettings } from "@/lib/firestore";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -21,11 +22,20 @@ export async function generateMetadata(): Promise<Metadata> {
       title,
       description,
       type: "website",
+      images: [
+        {
+          url: "/attempt-hero-weightlifting.png",
+          width: 1024,
+          height: 1536,
+          alt: "Attempt Coaching weightlifting hero image",
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
+      images: ["/attempt-hero-weightlifting.png"],
     },
   };
 }
@@ -57,12 +67,21 @@ export default async function AboutPage() {
 
       <section className="section">
         <div className="container">
-          <div className="sectionHeader">
+          <div className="aboutFounder">
             <div>
               <div className="kicker">{content.founderKicker}</div>
               <h2>{content.founderTitle}</h2>
             </div>
-            <p>{content.founderText}</p>
+
+            <div>
+              <p>{content.founderText}</p>
+
+              <ul className="list aboutStandards">
+                {aboutStandards.map((standard) => (
+                  <li key={standard}>{standard}</li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
       </section>
@@ -93,6 +112,15 @@ export default async function AboutPage() {
               <h2>{content.philosophyTitle}</h2>
             </div>
             <p>{content.philosophyText}</p>
+          </div>
+
+          <div className="grid3">
+            {aboutPrinciples.map(([title, text]) => (
+              <article className="card" key={title}>
+                <h3>{title}</h3>
+                <p>{text}</p>
+              </article>
+            ))}
           </div>
         </div>
       </section>
