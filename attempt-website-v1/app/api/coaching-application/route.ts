@@ -41,10 +41,11 @@ async function sendApplicationNotification(
     return false;
   }
 
+  const applicantName = `${application.firstName} ${application.lastName}`.trim();
   const body = [
     "A new coaching application has been received.",
     "",
-    `Applicant name: ${application.name}`,
+    `Applicant name: ${applicantName}`,
     `Applicant email: ${application.email}`,
     `Country: ${application.country}`,
     `Submitted: ${formatSubmittedAt(submittedAt)} UTC`,
@@ -61,7 +62,7 @@ async function sendApplicationNotification(
     body: JSON.stringify({
       from: notificationSender,
       to: [notificationRecipient],
-      subject: `New coaching application from ${application.name}`,
+      subject: `New coaching application from ${applicantName}`,
       text: body,
     }),
   });
@@ -77,16 +78,25 @@ async function sendApplicationNotification(
 export async function POST(request: Request) {
   const application = (await request.json()) as ApplicationPayload;
 
-  if (!application.name || !application.email || !application.country) {
+  if (
+    !application.firstName ||
+    !application.lastName ||
+    !application.email ||
+    !application.country ||
+    !application.countryCode
+  ) {
     return NextResponse.json(
-      { error: "Name, email, and country are required." },
+      { error: "First name, last name, email, and country are required." },
       { status: 400 },
     );
   }
 
   const submittedAt = new Date();
 
-  await submitApplication(application);
+  await submitApplication({
+    ...application,
+    name: `${application.firstName} ${application.lastName}`.trim(),
+  });
 
   let notificationSent = false;
 

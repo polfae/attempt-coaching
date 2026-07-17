@@ -17,9 +17,47 @@ import { db, hasFirebaseConfig } from "./firebase";
 import { samplePrograms } from "./content";
 
 export type CoachingApplication = {
-  name: string;
+  firstName: string;
+  lastName: string;
+  name?: string;
   email: string;
+  dateOfBirth: string;
+  gender: "female" | "male";
   country: string;
+  countryCode: string;
+  bodyweightKg: number;
+  weightClass: string;
+  weightliftingTrainingYears: number;
+  competitionExperience:
+    | "never_competed"
+    | "local"
+    | "national"
+    | "international";
+  lifts: {
+    snatch: number;
+    cleanAndJerk: number;
+    total?: number;
+    clean: number;
+    jerk: number;
+    backSquat: number;
+    frontSquat: number;
+  };
+  trainingDaysPerWeek: number;
+  mainGoals: string[];
+  otherGoal?: string;
+  goalsDescription: string;
+  struggle: string;
+  hasInjuries: boolean;
+  injuryDescription?: string;
+  whyAttempt?: string;
+  coachExpectations: string;
+  hadOnlineCoach: boolean;
+  preparingForCompetition: boolean;
+  competitionName?: string;
+  competitionDate?: string;
+  consent: boolean;
+
+  // Legacy fields retained so older applications still render in the CMS.
   age?: string;
   bodyweight?: string;
   trainingAge?: string;
@@ -29,16 +67,13 @@ export type CoachingApplication = {
   bestSnatch?: string;
   bestCleanJerk?: string;
   bestTotal?: string;
-  competitionExperience?: string;
+  competitionExperienceText?: string;
   currentTraining?: string;
   goals?: string;
   injuries?: string;
   availability?: string;
   links?: string;
-  struggle?: string;
-  whyAttempt?: string;
   onlineCoachingBefore?: string;
-  consent: boolean;
 };
 
 export type Program = {

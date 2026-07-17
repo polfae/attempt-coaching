@@ -6,9 +6,37 @@ import { AdminFormField } from "@/components/AdminFormField";
 
 type Application = {
   id: string;
+  firstName?: string;
+  lastName?: string;
   name?: string;
   email?: string;
+  dateOfBirth?: string;
+  gender?: string;
   country?: string;
+  countryCode?: string;
+  bodyweightKg?: number;
+  weightClass?: string;
+  weightliftingTrainingYears?: number;
+  lifts?: {
+    snatch?: number;
+    cleanAndJerk?: number;
+    total?: number;
+    clean?: number;
+    jerk?: number;
+    backSquat?: number;
+    frontSquat?: number;
+  };
+  trainingDaysPerWeek?: number;
+  mainGoals?: string[];
+  otherGoal?: string;
+  goalsDescription?: string;
+  hasInjuries?: boolean;
+  injuryDescription?: string;
+  coachExpectations?: string;
+  hadOnlineCoach?: boolean;
+  preparingForCompetition?: boolean;
+  competitionName?: string;
+  competitionDate?: string;
   age?: string;
   bodyweight?: string;
   trainingAge?: string;
@@ -74,15 +102,34 @@ function formatDate(createdAt: Application["createdAt"]) {
   });
 }
 
-function Field({ label, value }: { label: string; value?: string | boolean }) {
+function Field({
+  label,
+  value,
+}: {
+  label: string;
+  value?: string | number | boolean | string[];
+}) {
   return (
     <div className="adminReadOnlyField">
       <strong>{label}</strong>
-      <span>
-        {value === true ? "Yes" : value === false ? "No" : value || "—"}
-      </span>
+      <span>{displayValue(value)}</span>
     </div>
   );
+}
+
+function applicantName(item: Application) {
+  return (
+    [item.firstName, item.lastName].filter(Boolean).join(" ") ||
+    item.name ||
+    "No name"
+  );
+}
+
+function displayValue(value?: string | number | boolean | string[]) {
+  if (Array.isArray(value)) return value.length ? value.join(", ") : "—";
+  if (value === true) return "Yes";
+  if (value === false) return "No";
+  return value || "—";
 }
 
 export function ApplicationsClient() {
@@ -122,10 +169,16 @@ export function ApplicationsClient() {
 
       const searchable = [
         item.name,
+        item.firstName,
+        item.lastName,
         item.email,
         item.country,
+        item.countryCode,
+        item.weightClass,
+        item.mainGoals?.join(" "),
         item.coachingPriority,
         item.readiness,
+        item.goalsDescription,
         item.goals,
         item.whyAttempt,
         item.currentTraining,
@@ -233,7 +286,7 @@ export function ApplicationsClient() {
                     }}
                   >
                     <td>
-                      <strong>{item.name || "No name"}</strong>
+                      <strong>{applicantName(item)}</strong>
                       <br />
                       <span style={{ color: "#656b78" }}>
                         {item.email || "—"}
@@ -283,7 +336,7 @@ export function ApplicationsClient() {
             >
               <div className="adminCardHeader">
                 <h2>
-                  {selected.name || "No name"}
+                  {applicantName(selected)}
                 </h2>
                 <p>
                   {selected.email || "No email"} ·{" "}
@@ -295,18 +348,33 @@ export function ApplicationsClient() {
             </div>
 
             <div className="grid3" style={{ marginBottom: 24 }}>
-              <Field label="Age" value={selected.age} />
-              <Field label="Bodyweight" value={selected.bodyweight} />
-              <Field label="Training age" value={selected.trainingAge} />
+              <Field label="Date of birth" value={selected.dateOfBirth || selected.age} />
+              <Field label="Gender" value={selected.gender} />
+              <Field label="Country" value={selected.country} />
               <Field
-                label="Coaching priority"
-                value={selected.coachingPriority}
+                label="Bodyweight"
+                value={
+                  selected.bodyweightKg
+                    ? `${selected.bodyweightKg} kg`
+                    : selected.bodyweight
+                }
               />
-              <Field label="Readiness" value={selected.readiness} />
-              <Field label="Next competition" value={selected.nextCompetition} />
-              <Field label="Best snatch" value={selected.bestSnatch} />
-              <Field label="Best clean & jerk" value={selected.bestCleanJerk} />
-              <Field label="Best total" value={selected.bestTotal} />
+              <Field label="Weight class" value={selected.weightClass} />
+              <Field
+                label="Training years"
+                value={
+                  selected.weightliftingTrainingYears ??
+                  selected.trainingAge
+                }
+              />
+              <Field
+                label="Training sessions/week"
+                value={selected.trainingDaysPerWeek}
+              />
+              <Field
+                label="Competition experience"
+                value={selected.competitionExperience}
+              />
             </div>
 
             <div
@@ -317,9 +385,10 @@ export function ApplicationsClient() {
                 {[
                   selected.coachingPriority &&
                     `Priority: ${selected.coachingPriority}`,
-                  selected.readiness && `Readiness: ${selected.readiness}`,
-                  selected.nextCompetition &&
-                    `Next competition: ${selected.nextCompetition}`,
+                  selected.mainGoals?.length &&
+                    `Goals: ${selected.mainGoals.join(", ")}`,
+                  selected.preparingForCompetition &&
+                    `Competition: ${selected.competitionDate || "planned"}`,
                 ]
                   .filter(Boolean)
                   .join(" · ") || "No triage fields provided yet."}
@@ -338,32 +407,63 @@ export function ApplicationsClient() {
             </div>
 
             <div style={{ display: "grid", gap: 18 }}>
+              <div className="grid3">
+                <Field
+                  label="Snatch"
+                  value={selected.lifts?.snatch ?? selected.bestSnatch}
+                />
+                <Field
+                  label="Clean and jerk"
+                  value={selected.lifts?.cleanAndJerk ?? selected.bestCleanJerk}
+                />
+                <Field
+                  label="Total"
+                  value={selected.lifts?.total ?? selected.bestTotal}
+                />
+                <Field label="Clean" value={selected.lifts?.clean} />
+                <Field label="Jerk" value={selected.lifts?.jerk} />
+                <Field label="Back squat" value={selected.lifts?.backSquat} />
+                <Field label="Front squat" value={selected.lifts?.frontSquat} />
+              </div>
               <Field
-                label="Competition experience"
-                value={selected.competitionExperience}
+                label="Main goals"
+                value={displayValue(selected.mainGoals)}
               />
+              <Field label="Other goal" value={selected.otherGoal} />
               <Field
-                label="Current coach or training setup"
-                value={selected.currentTraining}
+                label="Describe goals"
+                value={selected.goalsDescription || selected.goals}
               />
-              <Field label="Main goals" value={selected.goals} />
-              <Field
-                label="Injuries or limitations"
-                value={selected.injuries}
-              />
-              <Field
-                label="Training availability"
-                value={selected.availability}
-              />
-              <Field label="Video/social links" value={selected.links} />
               <Field label="Biggest struggle" value={selected.struggle} />
               <Field
-                label="Why Attempt Coaching?"
-                value={selected.whyAttempt}
+                label="Has injuries or limitations"
+                value={selected.hasInjuries ?? selected.injuries}
               />
               <Field
-                label="Used online coaching before?"
-                value={selected.onlineCoachingBefore}
+                label="Injury description"
+                value={selected.injuryDescription || selected.injuries}
+              />
+              <Field label="Why Attempt?" value={selected.whyAttempt} />
+              <Field
+                label="Coach expectations"
+                value={selected.coachExpectations}
+              />
+              <Field
+                label="Previously had online coach"
+                value={
+                  selected.hadOnlineCoach ?? selected.onlineCoachingBefore
+                }
+              />
+              <Field
+                label="Preparing for competition"
+                value={
+                  selected.preparingForCompetition ?? selected.nextCompetition
+                }
+              />
+              <Field label="Competition name" value={selected.competitionName} />
+              <Field
+                label="Competition date"
+                value={selected.competitionDate || selected.nextCompetition}
               />
               <Field label="Consent to be contacted" value={selected.consent} />
             </div>

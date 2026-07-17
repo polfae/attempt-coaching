@@ -807,6 +807,12 @@ p {
   gap: 8px;
 }
 
+.fieldHint {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
 label {
   color: var(--text);
   font-size: 14px;
@@ -839,13 +845,18 @@ select:focus {
 .checkboxRow {
   display: flex;
   gap: 12px;
-  align-items: flex-start;
-  color: var(--muted);
+  align-items: center;
+  padding: 15px 16px;
+  border: 1px solid rgba(0, 194, 255, 0.34);
+  border-radius: 16px;
+  background: rgba(0, 194, 255, 0.075);
+  color: var(--text);
+  font-weight: 750;
 }
 
 .checkboxRow input {
   width: auto;
-  margin-top: 5px;
+  margin: 0;
 }
 
 .applySection {
@@ -856,7 +867,195 @@ select:focus {
 }
 
 .applyForm {
-  overflow: hidden;
+  overflow: visible;
+}
+
+.applyForm input,
+.applyForm select,
+.applyForm textarea {
+  display: block;
+  min-height: 44px;
+  height: 44px;
+  border-radius: 14px;
+  padding: 11px 13px;
+  line-height: 1.25;
+}
+
+.applyForm input[type="checkbox"] {
+  display: inline-block;
+  width: auto;
+  min-height: 0;
+  height: auto;
+  padding: 0;
+}
+
+.applyForm input[type="hidden"] {
+  display: none;
+}
+
+.applyForm input[type="number"] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.applyForm input[type="number"]::-webkit-outer-spin-button,
+.applyForm input[type="number"]::-webkit-inner-spin-button {
+  margin: 0;
+  appearance: none;
+}
+
+.applyForm textarea {
+  height: auto;
+  min-height: 104px;
+}
+
+.applyForm select {
+  appearance: none;
+  color-scheme: dark;
+  border-color: rgba(255, 255, 255, 0.12);
+  background-color: rgba(26, 28, 32, 0.98);
+  padding-right: 38px;
+  background-image:
+    linear-gradient(45deg, transparent 50%, rgba(245, 244, 238, 0.7) 50%),
+    linear-gradient(135deg, rgba(245, 244, 238, 0.7) 50%, transparent 50%);
+  background-position:
+    calc(100% - 18px) 50%,
+    calc(100% - 13px) 50%;
+  background-size:
+    5px 5px,
+    5px 5px;
+  background-repeat: no-repeat;
+}
+
+.applyForm select option,
+.applyForm select optgroup {
+  background: #1a1c20;
+  color: var(--text);
+}
+
+.applyForm .grid2,
+.applyForm .grid3 {
+  align-items: start;
+}
+
+.customSelect {
+  position: relative;
+  z-index: 4;
+}
+
+.customSelect > button {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  min-height: 44px;
+  padding: 11px 38px 11px 13px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: rgba(26, 28, 32, 0.98);
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.18s ease,
+    background 0.18s ease,
+    color 0.18s ease;
+}
+
+.customSelect > button::after {
+  position: absolute;
+  top: 50%;
+  right: 15px;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid rgba(245, 244, 238, 0.72);
+  border-bottom: 2px solid rgba(245, 244, 238, 0.72);
+  content: "";
+  transform: translateY(-65%) rotate(45deg);
+}
+
+.customSelect > button:hover,
+.customSelect > button[aria-expanded="true"] {
+  border-color: rgba(0, 194, 255, 0.42);
+  background: rgba(26, 28, 32, 1);
+}
+
+.customSelect > button.placeholder {
+  color: var(--muted);
+}
+
+.customSelect > button:disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
+}
+
+.customSelectMenu {
+  min-width: 100%;
+}
+
+.customSelectGroup {
+  display: grid;
+  gap: 4px;
+}
+
+.customSelectGroup + .customSelectGroup {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.customSelectGroup strong {
+  padding: 7px 10px 3px;
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.inputWithSuffix {
+  position: relative;
+}
+
+.inputWithSuffix input {
+  padding-right: 18px;
+}
+
+.inputWithSuffix span {
+  position: absolute;
+  top: 50%;
+  left: calc(13px + var(--value-length, 1ch) + 8px);
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 750;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.inputWithSuffix input:placeholder-shown + span {
+  opacity: 0;
+}
+
+.inputWithSuffix input::placeholder {
+  color: var(--muted);
+  opacity: 0.78;
+}
+
+.dateInputWrap input {
+  padding-right: 112px;
+}
+
+.dateInputWrap span {
+  right: 12px;
+  left: auto;
+}
+
+.dateInputWrap input:placeholder-shown + span {
+  opacity: 1;
 }
 
 .applyFormHeader {
@@ -937,6 +1136,10 @@ select:focus {
   color: var(--text);
 }
 
+.applySteps button.completed {
+  border-color: rgba(25, 240, 208, 0.25);
+}
+
 .applySteps button:not(:disabled):hover {
   transform: translateY(-2px);
   border-color: rgba(255, 255, 255, 0.24);
@@ -970,6 +1173,134 @@ select:focus {
   margin: 0;
   color: #ffb4b4;
   font-weight: 800;
+}
+
+.countryField {
+  position: relative;
+  z-index: 5;
+}
+
+.countryResults {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 8px);
+  right: 0;
+  left: 0;
+  display: grid;
+  gap: 6px;
+  max-height: 184px;
+  overflow: auto;
+  padding: 6px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: rgba(26, 28, 32, 0.98);
+  box-shadow: 0 22px 55px rgba(0, 0, 0, 0.34);
+  backdrop-filter: blur(14px);
+}
+
+.countryResults button {
+  min-height: 36px;
+  padding: 0 10px;
+  border: 1px solid transparent;
+  border-radius: 11px;
+  background: transparent;
+  color: var(--muted);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.18s ease,
+    background 0.18s ease,
+    color 0.18s ease;
+}
+
+.countryResults button:hover,
+.countryResults button.active {
+  border-color: rgba(0, 194, 255, 0.26);
+  background: rgba(0, 194, 255, 0.08);
+  color: var(--text);
+}
+
+.countryResults span {
+  padding: 9px 10px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.liftingStepPanel {
+  gap: 18px;
+}
+
+.liftingBasics {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  max-width: none;
+}
+
+.liftingMetrics {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.trainingFrequencyField {
+  max-width: none;
+}
+
+.fieldLabelRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: baseline;
+}
+
+.fieldLabelRow span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.goalOptions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.goalOptions label {
+  position: relative;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  min-height: 58px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.045);
+  color: var(--muted);
+  cursor: pointer;
+  transition:
+    border-color 0.18s ease,
+    background 0.18s ease,
+    color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.goalOptions label.selected {
+  border-color: rgba(0, 194, 255, 0.65);
+  background: rgba(0, 194, 255, 0.09);
+  color: var(--text);
+  box-shadow: inset 0 0 0 1px rgba(25, 240, 208, 0.16);
+}
+
+.goalOptions input[type="checkbox"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  min-height: 0;
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.goalOptions span {
+  line-height: 1.35;
 }
 
 @keyframes applyStepEnter {
@@ -1640,6 +1971,16 @@ select:focus {
     grid-template-columns: 1fr;
   }
 
+  .liftingBasics,
+  .liftingMetrics {
+    grid-template-columns: 1fr;
+    max-width: none;
+  }
+
+  .trainingFrequencyField {
+    max-width: none;
+  }
+
   .sectionHeader {
     display: block;
   }
@@ -2074,6 +2415,10 @@ select:focus {
   }
 
   .applySteps {
+    grid-template-columns: 1fr;
+  }
+
+  .goalOptions {
     grid-template-columns: 1fr;
   }
 
