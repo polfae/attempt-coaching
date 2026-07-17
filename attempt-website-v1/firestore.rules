@@ -33,6 +33,16 @@ service cloud.firestore {
       allow create, update, delete: if isAdmin();
     }
 
+    match /articles/{id} {
+      allow read: if resource.data.status == "published" ||
+        (
+          resource.data.status == "scheduled" &&
+          resource.data.publishAtMillis <= request.time.toMillis()
+        ) ||
+        isAdmin();
+      allow create, update, delete: if isAdmin();
+    }
+
     match /siteSettings/{id} { allow read: if true; allow write: if isAdmin(); }
     match /homepage/{id} { allow read: if true; allow write: if isAdmin(); }
     match /pages/{id} { allow read: if true; allow write: if isAdmin(); }

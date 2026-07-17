@@ -9,7 +9,6 @@ import {
   coachingProcess,
   coachingFeatures,
   coachingFor,
-  heroSignals,
   problems,
   samplePrograms,
   testimonials as fallbackTestimonials,
@@ -89,30 +88,6 @@ export default async function HomePage() {
             <div className="kicker">{content.heroKicker}</div>
 
             <h1>{content.heroHeadline}</h1>
-
-            <p className="lead">{content.heroText}</p>
-
-            <div className="actions">
-              <Link
-                className="btn btnPrimary"
-                href={content.heroPrimaryCtaLink}
-              >
-                {content.heroPrimaryCtaLabel}
-              </Link>
-
-              <Link
-                className="btn btnGhost"
-                href={content.heroSecondaryCtaLink}
-              >
-                {content.heroSecondaryCtaLabel}
-              </Link>
-            </div>
-
-            <div className="heroSignals" aria-label="Attempt coaching focus">
-              {heroSignals.map((signal) => (
-                <span key={signal}>{signal}</span>
-              ))}
-            </div>
           </div>
 
           <div className="visualCard" aria-label="Attempt weightlifting coaching">
@@ -267,7 +242,13 @@ export default async function HomePage() {
         </div>
 
         {testimonialsToShow.length > 0 ? (
-          <div className="grid2 proofQuotes">
+          <div
+            className={`proofQuotes ${
+              testimonialsToShow.length > 1
+                ? "cardCluster cardCluster2"
+                : "proofQuotesSingle"
+            }`}
+          >
             {testimonialsToShow.map((item) => (
               <article className="card" key={item.id ?? item.name}>
                 {item.featured && (
@@ -299,7 +280,7 @@ export default async function HomePage() {
         title={content.programsTitle}
         text={content.programsText}
       >
-        <div className="grid3">
+        <div className="cardCluster cardCluster3">
           {programsToShow.map((program) => (
             <article className="card" key={program.id ?? program.slug}>
               <div className="kicker">

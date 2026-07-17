@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { CardGrid } from "@/components/CardGrid";
 import { PublicLayout } from "@/components/PublicLayout";
 import { getAppContent, getSiteSettings } from "@/lib/firestore";
 
@@ -41,18 +42,6 @@ export default async function AppPage() {
             <div className="kicker">{content.heroKicker}</div>
 
             <h1>{content.heroHeadline}</h1>
-
-            <p className="lead">{content.heroText}</p>
-
-            <div className="actions">
-              <a className="btn btnPrimary" href={content.heroPrimaryCtaLink}>
-                {content.heroPrimaryCtaLabel}
-              </a>
-
-              <a className="btn btnGhost" href={content.heroSecondaryCtaLink}>
-                {content.heroSecondaryCtaLabel}
-              </a>
-            </div>
           </div>
 
           <div className="visualCard">
@@ -68,26 +57,13 @@ export default async function AppPage() {
         <div className="container">
           <div className="sectionHeader">
             <div>
-              <div className="kicker">{content.valueKicker}</div>
-              <h2>{content.valueTitle}</h2>
-            </div>
-            <p>{content.valueText}</p>
-          </div>
-        </div>
-      </section>
-
-      <section className="section">
-        <div className="container">
-          <div className="sectionHeader">
-            <div>
               <div className="kicker">{content.featuresKicker}</div>
               <h2>{content.featuresTitle}</h2>
             </div>
-            <p>{content.featuresText}</p>
           </div>
 
-          <div className="grid3">
-            {[
+          <CardGrid
+            items={[
               [
                 "Planned attempts",
                 "Keep the intended meet plan visible before the competition starts.",
@@ -112,25 +88,8 @@ export default async function AppPage() {
                 "Future standalone access",
                 "Non-coached lifters and coaches may access the app separately later.",
               ],
-            ].map(([title, text]) => (
-              <article className="card" key={title}>
-                <h3>{title}</h3>
-                <p>{text}</p>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="section">
-        <div className="container">
-          <div className="sectionHeader">
-            <div>
-              <div className="kicker">{content.coachingKicker}</div>
-              <h2>{content.coachingTitle}</h2>
-            </div>
-            <p>{content.coachingText}</p>
-          </div>
+            ]}
+          />
         </div>
       </section>
 
@@ -144,8 +103,6 @@ export default async function AppPage() {
               </div>
 
               <div>
-                <p>{content.accessText}</p>
-
                 <div className="actions">
                   <a className="btn btnPrimary" href={content.accessCtaLink}>
                     {content.accessCtaLabel}
@@ -159,18 +116,6 @@ export default async function AppPage() {
 
       <section className="section">
         <div className="container">
-          <div className="sectionHeader">
-            <div>
-              <div className="kicker">{content.futureKicker}</div>
-              <h2>{content.futureTitle}</h2>
-            </div>
-            <p>{content.futureText}</p>
-          </div>
-        </div>
-      </section>
-
-      <section className="section">
-        <div className="container">
           <div className="panel">
             <div className="sectionHeader" style={{ marginBottom: 0 }}>
               <div>
@@ -178,8 +123,6 @@ export default async function AppPage() {
               </div>
 
               <div>
-                <p>{content.finalCtaText}</p>
-
                 <div className="actions">
                   <a
                     className="btn btnPrimary"

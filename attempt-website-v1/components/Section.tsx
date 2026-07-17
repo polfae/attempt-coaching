@@ -3,7 +3,6 @@ import type { ReactNode } from "react";
 export function Section({
   kicker,
   title,
-  text,
   children,
 }: {
   kicker?: string;
@@ -19,8 +18,6 @@ export function Section({
             {kicker && <div className="kicker">{kicker}</div>}
             <h2>{title}</h2>
           </div>
-
-          {text && <p>{text}</p>}
         </div>
 
         {children}

@@ -45,17 +45,6 @@ export default async function CoachingPage() {
             <div className="kicker">{content.heroKicker}</div>
 
             <h1>{content.heroHeadline}</h1>
-
-            <p className="lead">{content.heroText}</p>
-
-            <div className="actions">
-              <Link
-                className="btn btnPrimary"
-                href={content.heroPrimaryCtaLink}
-              >
-                {content.heroPrimaryCtaLabel}
-              </Link>
-            </div>
           </div>
 
           <div className="visualCard">
@@ -66,12 +55,6 @@ export default async function CoachingPage() {
           </div>
         </div>
       </section>
-
-      <Section
-        kicker={content.philosophyKicker}
-        title={content.philosophyTitle}
-        text={content.philosophyText}
-      />
 
       <Section kicker={content.includedKicker} title={content.includedTitle}>
         <CardGrid items={coachingFeatures} />
@@ -105,18 +88,6 @@ export default async function CoachingPage() {
         />
       </Section>
 
-      <Section
-        kicker={content.competitionKicker}
-        title={content.competitionTitle}
-        text={content.competitionText}
-      />
-
-      <Section
-        kicker={content.appKicker}
-        title={content.appTitle}
-        text={content.appText}
-      />
-
       <Section kicker={content.fitKicker} title={content.fitTitle}>
         <ul className="list grid2">
           {coachingFor.map((item) => (
@@ -124,12 +95,6 @@ export default async function CoachingPage() {
           ))}
         </ul>
       </Section>
-
-      <Section
-        kicker={content.notForKicker}
-        title={content.notForTitle}
-        text={content.notForText}
-      />
 
       <Section
         kicker={content.availabilityKicker}

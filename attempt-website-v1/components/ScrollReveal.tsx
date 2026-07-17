@@ -7,7 +7,6 @@ const revealSelector = [
   ".hero h1",
   ".hero .lead",
   ".hero .actions",
-  ".heroSignals",
   ".visualCard",
   ".trustStrip",
   ".sectionHeader",

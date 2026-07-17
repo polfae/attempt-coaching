@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { auth } from "@/lib/firebase";
-import { navLinks } from "@/lib/content";
 import { defaultSiteSettings } from "@/lib/firestore";
 import type { SiteSettings } from "@/lib/firestore";
 import { Logo } from "./Logo";
@@ -31,22 +30,6 @@ export function PublicFooter({ settings }: { settings?: SiteSettings }) {
   return (
     <footer className="footer">
       <div className="container">
-        <div className="footerCta">
-          <div>
-            <span className="kicker">Ready when you are</span>
-            <h2>Train with structure. Compete with a plan.</h2>
-          </div>
-
-          <div className="footerCtaActions">
-            <Link className="btn btnPrimary" href="/apply">
-              Apply for Coaching
-            </Link>
-            <Link className="btn btnGhost" href="/contact">
-              Ask a Question
-            </Link>
-          </div>
-        </div>
-
         <div className="footerTop">
           <div className="footerBrand">
             <Logo />
@@ -101,13 +84,6 @@ export function PublicFooter({ settings }: { settings?: SiteSettings }) {
           <button className="copyright" onClick={goToAdmin}>
             © {year} {safeSettings.siteName || "Attempt"}
           </button>
-          <div className="footerUtility">
-            {navLinks.slice(0, 3).map((link) => (
-              <Link key={link.href} href={link.href}>
-                {link.label}
-              </Link>
-            ))}
-          </div>
         </div>
       </div>
     </footer>

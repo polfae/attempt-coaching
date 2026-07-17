@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { CardGrid } from "@/components/CardGrid";
 import { PublicLayout } from "@/components/PublicLayout";
 import { aboutPrinciples, aboutStandards } from "@/lib/content";
 import { getAboutContent, getSiteSettings } from "@/lib/firestore";
@@ -50,18 +51,6 @@ export default async function AboutPage() {
           <div className="kicker">{content.heroKicker}</div>
 
           <h1>{content.heroHeadline}</h1>
-
-          <p className="lead">{content.heroText}</p>
-
-          <div className="actions">
-            <a className="btn btnPrimary" href={content.heroPrimaryCtaLink}>
-              {content.heroPrimaryCtaLabel}
-            </a>
-
-            <a className="btn btnGhost" href={content.heroSecondaryCtaLink}>
-              {content.heroSecondaryCtaLabel}
-            </a>
-          </div>
         </div>
       </section>
 
@@ -88,7 +77,7 @@ export default async function AboutPage() {
 
       <section className="section">
         <div className="container">
-          <div className="grid2">
+          <div className="cardCluster cardCluster2">
             <article className="card">
               <div className="kicker">{content.backgroundKicker}</div>
               <h3>{content.backgroundTitle}</h3>
@@ -111,31 +100,9 @@ export default async function AboutPage() {
               <div className="kicker">{content.philosophyKicker}</div>
               <h2>{content.philosophyTitle}</h2>
             </div>
-            <p>{content.philosophyText}</p>
           </div>
 
-          <div className="grid3">
-            {aboutPrinciples.map(([title, text]) => (
-              <article className="card" key={title}>
-                <h3>{title}</h3>
-                <p>{text}</p>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="section">
-        <div className="container">
-          <div className="panel">
-            <div className="sectionHeader" style={{ marginBottom: 0 }}>
-              <div>
-                <div className="kicker">{content.whyKicker}</div>
-                <h2>{content.whyTitle}</h2>
-              </div>
-              <p>{content.whyText}</p>
-            </div>
-          </div>
+          <CardGrid items={aboutPrinciples} />
         </div>
       </section>
 
@@ -148,8 +115,6 @@ export default async function AboutPage() {
               </div>
 
               <div>
-                <p>{content.finalCtaText}</p>
-
                 <div className="actions">
                   <a
                     className="btn btnPrimary"

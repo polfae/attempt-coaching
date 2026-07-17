@@ -3,6 +3,7 @@ export const navLinks = [
   { href: "/coaching", label: "Coaching" },
   { href: "/app", label: "App" },
   { href: "/programs", label: "Programs" },
+  { href: "/articles", label: "Articles" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
 ];
@@ -212,6 +213,11 @@ export const adminLinks = [
     href: "/admin/programs",
     label: "Programs",
     description: "Create, edit, hide, and feature digital programs.",
+  },
+  {
+    href: "/admin/articles",
+    label: "Articles",
+    description: "Create, edit, publish, and manage educational articles.",
   },
   {
     href: "/admin/testimonials",

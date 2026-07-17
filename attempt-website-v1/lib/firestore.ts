@@ -96,6 +96,29 @@ export type Program = {
   updatedAt?: unknown;
 };
 
+export type ArticleStatus = "draft" | "published" | "scheduled";
+
+export type Article = {
+  id?: string;
+  title: string;
+  slug: string;
+  subtitle?: string;
+  excerpt: string;
+  featuredImage?: string;
+  category: string;
+  tags: string[];
+  author: string;
+  body: string;
+  status: ArticleStatus;
+  publishedAt?: string;
+  publishAtMillis?: number;
+  seoTitle?: string;
+  seoDescription?: string;
+  readingTime?: string;
+  createdAt?: unknown;
+  updatedAt?: unknown;
+};
+
 export type Testimonial = {
   id?: string;
   name: string;
@@ -725,6 +748,152 @@ export async function deleteProgram(id: string) {
   }
 
   return deleteDoc(doc(db, "programs", id));
+}
+
+const sampleArticles: Article[] = [
+  {
+    title: "How to Build a Better Snatch Start Position",
+    slug: "how-to-build-a-better-snatch-start-position",
+    subtitle: "A practical look at balance, tension, and patience from the floor.",
+    excerpt:
+      "A better snatch often starts before the bar leaves the platform. Learn how to create a more consistent start position.",
+    featuredImage: "/attempt-hero-weightlifting.png",
+    category: "Technique",
+    tags: ["snatch", "technique"],
+    author: "Pól Hendrikur Andreasen",
+    body: `
+      <p>The start position does not need to look identical for every lifter, but it should create the same outcome: balance over the whole foot, tension through the trunk, and a bar that can stay close from the floor.</p>
+      <h2>Start with pressure</h2>
+      <p>Before thinking about speed, make sure the lifter can feel pressure through the midfoot. If the bar pulls the athlete forward before the lift starts, the rest of the pull becomes a correction.</p>
+      <blockquote>Better positions make better timing easier.</blockquote>
+      <h2>Simple checks</h2>
+      <ul><li>Shoulders slightly over the bar</li><li>Arms relaxed and long</li><li>Back tension without rushing the first pull</li></ul>
+    `,
+    status: "published",
+    publishedAt: "2026-07-01T09:00:00.000Z",
+    publishAtMillis: 1782896400000,
+    seoTitle: "How to Build a Better Snatch Start Position",
+    seoDescription:
+      "Improve your snatch start position with practical cues for balance, tension, and bar path.",
+    readingTime: "3 min read",
+  },
+];
+
+function estimateReadingTime(body: string) {
+  const words = body.replace(/<[^>]+>/g, " ").trim().split(/\s+/).filter(Boolean);
+  return `${Math.max(1, Math.ceil(words.length / 220))} min read`;
+}
+
+export async function getArticles() {
+  if (!hasFirebaseConfig || !db) return sampleArticles;
+
+  const snapshot = await getDocs(
+    query(collection(db, "articles"), orderBy("updatedAt", "desc")),
+  );
+
+  const articles = snapshot.docs.map((item) => ({
+    id: item.id,
+    ...item.data(),
+  })) as Article[];
+
+  return articles.length ? articles : sampleArticles;
+}
+
+export async function getPublishedArticles() {
+  return readWithFallback("published articles", sampleArticles, async (activeDb) => {
+    const publishedSnapshot = await getDocs(
+      query(
+        collection(activeDb, "articles"),
+        where("status", "==", "published"),
+      ),
+    );
+
+    const scheduledSnapshot = await getDocs(
+      query(
+        collection(activeDb, "articles"),
+        where("status", "==", "scheduled"),
+        where("publishAtMillis", "<=", Date.now()),
+      ),
+    );
+
+    const articles = [...publishedSnapshot.docs, ...scheduledSnapshot.docs].map((item) => ({
+      id: item.id,
+      ...item.data(),
+    })) as Article[];
+
+    return articles.sort((a, b) => {
+      const aDate = a.publishedAt ?? "";
+      const bDate = b.publishedAt ?? "";
+      return bDate.localeCompare(aDate);
+    });
+  });
+}
+
+export async function getPublishedArticleBySlug(slug: string) {
+  const fallbackArticle =
+    sampleArticles.find((article) => article.slug === slug) ?? null;
+
+  return readWithFallback("published article by slug", fallbackArticle, async (activeDb) => {
+    const publishedSnapshot = await getDocs(
+      query(
+        collection(activeDb, "articles"),
+        where("status", "==", "published"),
+      ),
+    );
+
+    const scheduledSnapshot = await getDocs(
+      query(
+        collection(activeDb, "articles"),
+        where("status", "==", "scheduled"),
+        where("publishAtMillis", "<=", Date.now()),
+      ),
+    );
+
+    return ([...publishedSnapshot.docs, ...scheduledSnapshot.docs].map((item) => ({
+      id: item.id,
+      ...item.data(),
+    })) as Article[]).find((article) => article.slug === slug) ?? null;
+  });
+}
+
+export async function createArticle(data: Article) {
+  if (!hasFirebaseConfig || !db) {
+    console.info("Firebase not configured. Article payload:", data);
+    return { offline: true };
+  }
+
+  const { id, ...articleData } = data;
+
+  return addDoc(collection(db, "articles"), {
+    ...articleData,
+    readingTime: estimateReadingTime(articleData.body),
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function updateArticle(id: string, data: Partial<Article>) {
+  if (!hasFirebaseConfig || !db) {
+    console.info("Firebase not configured. Article update:", id, data);
+    return { offline: true };
+  }
+
+  const updatePayload = {
+    ...data,
+    ...(data.body ? { readingTime: estimateReadingTime(data.body) } : {}),
+    updatedAt: serverTimestamp(),
+  };
+
+  return updateDoc(doc(db, "articles", id), updatePayload);
+}
+
+export async function deleteArticle(id: string) {
+  if (!hasFirebaseConfig || !db) {
+    console.info("Firebase not configured. Article delete:", id);
+    return { offline: true };
+  }
+
+  return deleteDoc(doc(db, "articles", id));
 }
 
 export async function getTestimonials() {

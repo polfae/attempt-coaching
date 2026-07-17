@@ -9,6 +9,7 @@ type AdminFormFieldProps = {
   placeholder?: string;
   required?: boolean;
   help?: string;
+  error?: string;
   children?: ReactNode;
   maxLength?: number;
 };
@@ -84,11 +85,14 @@ export function AdminFormField({
   placeholder,
   required,
   help,
+  error,
   children,
   maxLength,
 }: AdminFormFieldProps) {
   const helperText = help ?? defaultHelp(id, label);
   const helperId = helperText ? `${id}-help` : undefined;
+  const errorId = error ? `${id}-error` : undefined;
+  const describedBy = [helperId, errorId].filter(Boolean).join(" ") || undefined;
 
   function handleChange(
     event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -97,7 +101,7 @@ export function AdminFormField({
   }
 
   return (
-    <div className="field adminField">
+    <div className={`field adminField${error ? " hasError" : ""}`}>
       <div className="adminFieldLabelRow">
         <label htmlFor={id}>{label}</label>
         {maxLength && (
@@ -114,7 +118,8 @@ export function AdminFormField({
           onChange={handleChange}
           placeholder={placeholder}
           required={required}
-          aria-describedby={helperId}
+          aria-invalid={Boolean(error)}
+          aria-describedby={describedBy}
           maxLength={maxLength}
         />
       ) : children ? (
@@ -127,9 +132,16 @@ export function AdminFormField({
           onChange={handleChange}
           placeholder={placeholder}
           required={required}
-          aria-describedby={helperId}
+          aria-invalid={Boolean(error)}
+          aria-describedby={describedBy}
           maxLength={maxLength}
         />
+      )}
+
+      {error && (
+        <p className="adminErrorText" id={errorId}>
+          {error}
+        </p>
       )}
 
       {helperText && (

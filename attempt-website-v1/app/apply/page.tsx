@@ -27,11 +27,6 @@ export default function ApplyPage() {
         <div className="container">
           <div className="kicker">Coaching application</div>
           <h1>Apply for Attempt Coaching.</h1>
-          <p className="lead">
-            This is not an instant checkout. The application helps decide
-            whether Attempt Coaching is the right fit for your goals, training
-            situation, and competition plans.
-          </p>
         </div>
       </section>
       <section className="section">

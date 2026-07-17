@@ -38,28 +38,12 @@ export default async function ContactPage() {
           <div className="kicker">Contact</div>
 
           <h1>Contact Attempt.</h1>
-
-          <p className="lead">
-            For app support, program questions, collaborations, business
-            inquiries, or technical issues. Coaching inquiries should go through
-            the application form.
-          </p>
-
-          <div className="actions">
-            <a className="btn btnPrimary" href="/apply">
-              Apply for Coaching
-            </a>
-
-            <a className="btn btnGhost" href={`mailto:${contactEmail}`}>
-              {contactEmail}
-            </a>
-          </div>
         </div>
       </section>
 
       <section className="section">
         <div className="container">
-          <div className="grid2">
+          <div className="cardCluster cardCluster2">
             <div className="card">
               <div className="kicker">Coaching</div>
 
@@ -105,11 +89,6 @@ export default async function ContactPage() {
                 </div>
 
                 <div>
-                  <p>
-                    Follow along for coaching updates, program releases, and
-                    competition preparation content.
-                  </p>
-
                   <div className="actions">
                     <a
                       className="btn btnGhost"

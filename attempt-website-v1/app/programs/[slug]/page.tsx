@@ -63,7 +63,6 @@ export default async function ProgramDetailPage({
   }
 
   const daysPerWeek = program.daysPerWeek ?? program.days;
-  const hasProductLink = Boolean(program.productLink);
 
   return (
     <PublicLayout>
@@ -71,23 +70,6 @@ export default async function ProgramDetailPage({
         <div className="container">
           <div className="kicker">{program.level || "Program"}</div>
           <h1>{program.title}</h1>
-          <p className="lead">{program.description}</p>
-
-          <div className="actions">
-            {hasProductLink ? (
-              <a className="btn btnPrimary" href={program.productLink}>
-                Buy Program
-              </a>
-            ) : (
-              <Link className="btn btnPrimary" href="/contact">
-                Ask About Program
-              </Link>
-            )}
-
-            <Link className="btn btnGhost" href="/programs">
-              Back to Programs
-            </Link>
-          </div>
         </div>
       </section>
 
@@ -144,12 +126,6 @@ export default async function ProgramDetailPage({
               </div>
 
               <div>
-                <p>
-                  Programs give you structure. Coaching adds the feedback loop:
-                  programming, video review, adjustments, and competition
-                  preparation around your actual lifting.
-                </p>
-
                 <div className="actions">
                   <Link className="btn btnPrimary" href="/apply">
                     Apply for Coaching

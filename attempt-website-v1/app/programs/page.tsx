@@ -37,18 +37,6 @@ export default async function ProgramsPage() {
         <div className="container">
           <div className="kicker">Digital programs</div>
           <h1>Weightlifting programs for structured training.</h1>
-          <p className="lead">
-            Programs are a secondary option for lifters who want structure, but
-            are not ready for full Attempt Coaching yet.
-          </p>
-          <div className="actions">
-            <Link className="btn btnPrimary" href="/apply">
-              Apply for Coaching
-            </Link>
-            <Link className="btn btnGhost" href="/coaching">
-              See Coaching First
-            </Link>
-          </div>
         </div>
       </section>
 
@@ -56,18 +44,13 @@ export default async function ProgramsPage() {
         <section className="section">
           <div className="container">
             <div className="sectionHeader">
-              <div>
-                <div className="kicker">Featured</div>
-                <h2>Start here.</h2>
-              </div>
-              <p>
-                Featured programs are the best starting points for lifters who
-                want a clear training direction without applying for full
-                coaching.
-              </p>
+            <div>
+              <div className="kicker">Featured</div>
+              <h2>Start here.</h2>
             </div>
+          </div>
 
-            <div className="grid3">
+            <div className="programGrid">
               {featuredPrograms.map((program) => (
                 <ProgramCard
                   key={program.id ?? program.slug}
@@ -86,14 +69,10 @@ export default async function ProgramsPage() {
               <div className="kicker">Catalogue</div>
               <h2>Available programs.</h2>
             </div>
-            <p>
-              Choose a program based on your current level, training
-              availability, and main goal.
-            </p>
           </div>
 
           {normalPrograms.length > 0 ? (
-            <div className="grid3">
+            <div className="programGrid">
               {normalPrograms.map((program) => (
                 <ProgramCard
                   key={program.id ?? program.slug}
@@ -122,11 +101,6 @@ export default async function ProgramsPage() {
                 <h2>Need individual feedback?</h2>
               </div>
               <div>
-                <p>
-                  A program gives you structure. Coaching gives you programming,
-                  feedback, competition preparation, and support around your
-                  actual training.
-                </p>
                 <div className="actions">
                   <Link className="btn btnPrimary" href="/apply">
                     Apply for Coaching
@@ -144,46 +118,63 @@ export default async function ProgramsPage() {
 function ProgramCard({ program }: { program: any }) {
   const daysPerWeek =
     program.daysPerWeek ?? program.days ?? program.trainingDaysPerWeek;
+  const detailHref = `/programs/${program.slug}`;
+  const purchaseHref = program.productLink || detailHref;
+  const purchaseIsExternal = Boolean(program.productLink);
 
   return (
-    <article className="card">
-      {program.featured && <div className="kicker">Featured program</div>}
-
-      <h3>{program.title}</h3>
+    <article className="programCard">
+      <div className="programCardTop">
+        <div>
+          <div className="kicker">
+            {program.featured ? "Featured program" : program.level || "Program"}
+          </div>
+          <h3>{program.title}</h3>
+        </div>
+        <div className="programPrice">{program.price || "Price TBA"}</div>
+      </div>
 
       <p>{program.description}</p>
 
-      <ul className="list" style={{ marginTop: 18 }}>
-        <li>
-          <strong>Level:</strong> {program.level || "—"}
-        </li>
-        <li>
-          <strong>Duration:</strong> {program.duration || "—"}
-        </li>
-        <li>
-          <strong>Training days:</strong> {daysPerWeek || "—"}
-        </li>
-        <li>
-          <strong>Goal:</strong> {program.goal || "—"}
-        </li>
-        <li>
-          <strong>Price:</strong> {program.price || "—"}
-        </li>
-      </ul>
+      <dl className="programMeta">
+        <div>
+          <dt>Level</dt>
+          <dd>{program.level || "—"}</dd>
+        </div>
+        <div>
+          <dt>Duration</dt>
+          <dd>{program.duration || "—"}</dd>
+        </div>
+        <div>
+          <dt>Training</dt>
+          <dd>{daysPerWeek || "—"}</dd>
+        </div>
+        <div>
+          <dt>Goal</dt>
+          <dd>{program.goal || "—"}</dd>
+        </div>
+      </dl>
 
-      {program.productLink ? (
-        <div className="actions">
-          <Link className="btn btnPrimary" href={`/programs/${program.slug}`}>
-            View Details
+      <div className="programActions">
+        {purchaseIsExternal ? (
+          <a
+            className="btn btnPrimary"
+            href={purchaseHref}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Purchase Program
+          </a>
+        ) : (
+          <Link className="btn btnPrimary" href={purchaseHref}>
+            Purchase Program
           </Link>
-        </div>
-      ) : (
-        <div className="actions">
-          <Link className="btn btnGhost" href={`/programs/${program.slug}`}>
-            View Details
-          </Link>
-        </div>
-      )}
+        )}
+
+        <Link className="btn btnGhost" href={detailHref}>
+          View Details
+        </Link>
+      </div>
     </article>
   );
 }
