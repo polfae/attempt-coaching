@@ -21,12 +21,14 @@ type ArticleForm = {
   author: string;
   body: string;
   status: "draft" | "published" | "scheduled";
-  publishedAt: string;
+  scheduledAt: string;
   seoTitle: string;
   seoDescription: string;
 };
 
 type ArticleValidationErrors = Partial<Record<keyof ArticleForm, string>>;
+type ArticleSortKey = "title" | "scheduledAt" | "publishedAt" | "updatedAt";
+type SortDirection = "asc" | "desc";
 
 const categories = [
   "Technique",
@@ -50,7 +52,7 @@ const emptyForm: ArticleForm = {
   author: "Pól Hendrikur Andreasen",
   body: "<p>Start writing...</p>",
   status: "draft",
-  publishedAt: "",
+  scheduledAt: "",
   seoTitle: "",
   seoDescription: "",
 };
@@ -73,6 +75,30 @@ function displayDate(value?: string) {
     hour: "2-digit",
     minute: "2-digit",
   }).format(new Date(value));
+}
+
+function articleTimestamp(value: unknown) {
+  if (!value) return Number.POSITIVE_INFINITY;
+
+  if (typeof value === "string") {
+    const time = new Date(value).getTime();
+    return Number.isNaN(time) ? Number.POSITIVE_INFINITY : time;
+  }
+
+  if (value instanceof Date) {
+    const time = value.getTime();
+    return Number.isNaN(time) ? Number.POSITIVE_INFINITY : time;
+  }
+
+  if (typeof value === "object" && value !== null && "toDate" in value) {
+    const date = (value as { toDate?: () => Date }).toDate?.();
+    const time = date?.getTime();
+    return typeof time === "number" && !Number.isNaN(time)
+      ? time
+      : Number.POSITIVE_INFINITY;
+  }
+
+  return Number.POSITIVE_INFINITY;
 }
 
 function toDatetimeLocalValue(value?: string) {
@@ -140,9 +166,13 @@ function getArticleText(body: string) {
     .trim();
 }
 
-function isValidIsoDate(value: string) {
+function isValidIsoDate(value?: string) {
   if (!value) return false;
   return !Number.isNaN(new Date(value).getTime());
+}
+
+function timestampForExistingArticle(article?: Article) {
+  return isValidIsoDate(article?.publishedAt) ? article?.publishedAt ?? "" : "";
 }
 
 function isPermissionError(error: unknown) {
@@ -176,7 +206,9 @@ function articleToForm(article: Article): ArticleForm {
     author: article.author ?? "Pól Hendrikur Andreasen",
     body: article.body || "<p>Start writing...</p>",
     status: article.status ?? "draft",
-    publishedAt: toDatetimeLocalValue(article.publishedAt),
+    scheduledAt: toDatetimeLocalValue(
+      article.scheduledAt || (article.status === "scheduled" ? article.publishedAt : ""),
+    ),
     seoTitle: article.seoTitle ?? "",
     seoDescription: article.seoDescription ?? "",
   };
@@ -188,6 +220,10 @@ export function ArticlesClient() {
   const [form, setForm] = useState<ArticleForm>(emptyForm);
   const [filter, setFilter] = useState<"all" | "draft" | "scheduled" | "published">("all");
   const [search, setSearch] = useState("");
+  const [sort, setSort] = useState<{ key: ArticleSortKey; direction: SortDirection }>({
+    key: "updatedAt",
+    direction: "desc",
+  });
   const [loading, setLoading] = useState(true);
   const [listError, setListError] = useState("");
   const [saving, setSaving] = useState(false);
@@ -268,7 +304,7 @@ export function ArticlesClient() {
   }, []);
 
   const filteredArticles = useMemo(() => {
-    return articles.filter((article) => {
+    const nextArticles = articles.filter((article) => {
       const statusMatch = filter === "all" || article.status === filter;
       const searchable = [
         article.title,
@@ -283,7 +319,42 @@ export function ArticlesClient() {
 
       return statusMatch && searchable.includes(search.toLowerCase());
     });
-  }, [articles, filter, search]);
+
+    return nextArticles.sort((a, b) => {
+      const direction = sort.direction === "asc" ? 1 : -1;
+
+      if (sort.key === "title") {
+        return direction * (a.title ?? "").localeCompare(b.title ?? "");
+      }
+
+      const aTime =
+        sort.key === "updatedAt"
+          ? articleTimestamp(a.updatedAt)
+          : articleTimestamp(a[sort.key]);
+      const bTime =
+        sort.key === "updatedAt"
+          ? articleTimestamp(b.updatedAt)
+          : articleTimestamp(b[sort.key]);
+
+      if (aTime === bTime) return (a.title ?? "").localeCompare(b.title ?? "");
+      if (aTime === Number.POSITIVE_INFINITY) return 1;
+      if (bTime === Number.POSITIVE_INFINITY) return -1;
+      return direction * (aTime - bTime);
+    });
+  }, [articles, filter, search, sort]);
+
+  function toggleSort(key: ArticleSortKey) {
+    setSort((current) => ({
+      key,
+      direction:
+        current.key === key && current.direction === "asc" ? "desc" : "asc",
+    }));
+  }
+
+  function sortLabel(key: ArticleSortKey, label: string) {
+    const isActive = sort.key === key;
+    return `${label}${isActive ? (sort.direction === "asc" ? " ↑" : " ↓") : ""}`;
+  }
 
   function updateField<K extends keyof ArticleForm>(
     key: K,
@@ -383,15 +454,15 @@ export function ArticlesClient() {
   }
 
   function buildPayload(nextStatus = form.status): Article {
-    const selectedIso = datetimeLocalToIso(form.publishedAt);
+    const selectedIso = datetimeLocalToIso(form.scheduledAt);
+    const existingPublishedAt = timestampForExistingArticle(selectedArticle);
+    const immediatePublishedAt = existingPublishedAt || new Date().toISOString();
     const publishStatus =
       nextStatus === "published" ? statusForPublishDate(selectedIso) : nextStatus;
     const publishedAt =
       nextStatus === "published"
-        ? publishStatus === "scheduled"
-          ? selectedIso
-          : new Date().toISOString()
-        : selectedIso;
+        ? selectedIso || immediatePublishedAt
+        : existingPublishedAt;
     const publishAtMillis = publishedAt
       ? new Date(publishedAt).getTime()
       : undefined;
@@ -410,6 +481,7 @@ export function ArticlesClient() {
       author: form.author.trim() || "Pól Hendrikur Andreasen",
       body: normalizeArticleHtml(form.body),
       status: publishStatus,
+      scheduledAt: selectedIso,
       publishedAt,
       ...(publishAtMillis ? { publishAtMillis } : {}),
       seoTitle: form.seoTitle.trim(),
@@ -441,6 +513,11 @@ export function ArticlesClient() {
     }
 
     if (status === "published" || status === "scheduled") {
+      if (form.scheduledAt && !isValidIsoDate(datetimeLocalToIso(form.scheduledAt))) {
+        nextErrors.scheduledAt =
+          "Add a valid schedule date and time, or leave the field empty.";
+      }
+
       if (!payload.excerpt) {
         nextErrors.excerpt = "Add a short excerpt before publishing.";
       }
@@ -458,7 +535,7 @@ export function ArticlesClient() {
       }
 
       if (!payload.publishedAt || !isValidIsoDate(payload.publishedAt)) {
-        nextErrors.publishedAt =
+        nextErrors.scheduledAt =
           "Add a valid publication date and time.";
       }
     }
@@ -478,7 +555,7 @@ export function ArticlesClient() {
       category: "#articleCategory",
       tags: "#articleTags",
       author: "#articleAuthor",
-      publishedAt: "#articlePublishedAt",
+      scheduledAt: "#articleScheduledAt",
       body: ".richEditor",
       seoTitle: "#articleSeoTitle",
       seoDescription: "#articleSeoDescription",
@@ -504,7 +581,8 @@ export function ArticlesClient() {
     const draftPayload: Article = {
       ...payload,
       status: "draft",
-      publishedAt: selectedArticle?.publishedAt ?? form.publishedAt,
+      scheduledAt: form.scheduledAt,
+      publishedAt: selectedArticle?.publishedAt ?? "",
     };
 
     if (!draftPayload.title || !draftPayload.slug || hasDuplicateSlug(draftPayload.slug)) {
@@ -679,6 +757,7 @@ export function ArticlesClient() {
       title: `${article.title} Copy`,
       slug: nextSlug,
       status: "draft",
+      scheduledAt: "",
       publishedAt: "",
     });
 
@@ -717,7 +796,7 @@ export function ArticlesClient() {
       </div>
 
       <div className="adminCmsLayout">
-        <div className="adminCard" style={{ padding: 0, overflow: "hidden" }}>
+        <div className="adminCard articleTableCard">
           {loading ? (
             <div style={{ padding: 22 }}>Loading articles...</div>
           ) : listError ? (
@@ -725,50 +804,83 @@ export function ArticlesClient() {
               <p className="adminErrorText">{listError}</p>
             </div>
           ) : (
-            <table className="adminTable">
-              <thead>
-                <tr>
-                  <th>Article</th>
-                  <th>Status</th>
-                  <th>Published</th>
-                  <th>Updated</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredArticles.map((article) => (
-                  <tr key={article.id ?? article.slug}>
-                    <td>
+            <div className="adminTableScroll" aria-label="Articles overview">
+              <table className="adminTable articleAdminTable">
+                <thead>
+                  <tr>
+                    <th>
                       <button
-                        className="adminLinkButton"
+                        className={`adminSortHeader${sort.key === "title" ? " active" : ""}`}
                         type="button"
-                        onClick={() => startEdit(article)}
+                        onClick={() => toggleSort("title")}
                       >
-                        <strong>{article.title}</strong>
-                        <span>
-                          {article.category} · {article.author}
-                        </span>
+                        {sortLabel("title", "Article")}
                       </button>
-                    </td>
-                    <td>
-                      <span className="status">{article.status}</span>
-                    </td>
-                    <td>{displayDate(article.publishedAt)}</td>
-                    <td>{displayDate((article.updatedAt as any)?.toDate?.() ?? undefined)}</td>
-                    <td>
-                      <div className="adminTableActions">
-                        <button type="button" onClick={() => duplicateArticle(article)}>
-                          Duplicate
-                        </button>
-                        <button type="button" onClick={() => removeArticle(article)}>
-                          Delete
-                        </button>
-                      </div>
-                    </td>
+                    </th>
+                    <th>Status</th>
+                    <th>
+                      <button
+                        className={`adminSortHeader${sort.key === "scheduledAt" ? " active" : ""}`}
+                        type="button"
+                        onClick={() => toggleSort("scheduledAt")}
+                      >
+                        {sortLabel("scheduledAt", "Scheduled")}
+                      </button>
+                    </th>
+                    <th>
+                      <button
+                        className={`adminSortHeader${sort.key === "publishedAt" ? " active" : ""}`}
+                        type="button"
+                        onClick={() => toggleSort("publishedAt")}
+                      >
+                        {sortLabel("publishedAt", "Published")}
+                      </button>
+                    </th>
+                    <th>
+                      <button
+                        className={`adminSortHeader${sort.key === "updatedAt" ? " active" : ""}`}
+                        type="button"
+                        onClick={() => toggleSort("updatedAt")}
+                      >
+                        {sortLabel("updatedAt", "Updated")}
+                      </button>
+                    </th>
+                    <th>Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {filteredArticles.map((article) => (
+                    <tr key={article.id ?? article.slug}>
+                      <td>
+                        <button
+                          className="adminLinkButton articleTitleButton"
+                          type="button"
+                          onClick={() => startEdit(article)}
+                        >
+                          <strong>{article.title}</strong>
+                        </button>
+                      </td>
+                      <td>
+                        <span className="status">{article.status}</span>
+                      </td>
+                      <td>{displayDate(article.scheduledAt)}</td>
+                      <td>{displayDate(article.publishedAt)}</td>
+                      <td>{displayDate((article.updatedAt as any)?.toDate?.() ?? undefined)}</td>
+                      <td>
+                        <div className="adminTableActions">
+                          <button type="button" onClick={() => duplicateArticle(article)}>
+                            Duplicate
+                          </button>
+                          <button type="button" onClick={() => removeArticle(article)}>
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
 
@@ -917,29 +1029,29 @@ export function ArticlesClient() {
               onChange={(value) => updateField("author", value)}
               error={errors.author}
             />
-            <div className={`field adminField${errors.publishedAt ? " hasError" : ""}`}>
-              <label htmlFor="articlePublishedAt">
+            <div className={`field adminField${errors.scheduledAt ? " hasError" : ""}`}>
+              <label htmlFor="articleScheduledAt">
                 Schedule date and time
               </label>
               <input
-                id="articlePublishedAt"
+                id="articleScheduledAt"
                 type="datetime-local"
-                value={form.publishedAt}
-                onChange={(event) => updateField("publishedAt", event.target.value)}
-                aria-invalid={Boolean(errors.publishedAt)}
+                value={form.scheduledAt}
+                onChange={(event) => updateField("scheduledAt", event.target.value)}
+                aria-invalid={Boolean(errors.scheduledAt)}
                 aria-describedby={
-                  errors.publishedAt
-                    ? "articlePublishedAt-error articlePublishedAt-help"
-                    : "articlePublishedAt-help"
+                  errors.scheduledAt
+                    ? "articleScheduledAt-error articleScheduledAt-help"
+                    : "articleScheduledAt-help"
                 }
               />
-              {errors.publishedAt && (
-                <p className="adminErrorText" id="articlePublishedAt-error">
-                  {errors.publishedAt}
+              {errors.scheduledAt && (
+                <p className="adminErrorText" id="articleScheduledAt-error">
+                  {errors.scheduledAt}
                 </p>
               )}
-              <p className="adminHelpText" id="articlePublishedAt-help">
-                Leave empty to publish immediately. Pick a future date and time to schedule.
+              <p className="adminHelpText" id="articleScheduledAt-help">
+                Leave empty to publish immediately. Existing published articles keep their current public date unless you enter a new one.
               </p>
             </div>
           </div>

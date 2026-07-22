@@ -19,64 +19,88 @@ type FieldConfig = {
 
 const sections: { title: string; fields: FieldConfig[] }[] = [
   {
-    title: "Hero",
+    title: "Attempt: page introduction",
     fields: [
-      { key: "heroKicker", label: "Kicker" },
-      { key: "heroHeadline", label: "Headline", type: "textarea" },
-      { key: "heroText", label: "Subtext", type: "textarea" },
-      { key: "heroPrimaryCtaLabel", label: "Primary CTA label" },
-      { key: "heroPrimaryCtaLink", label: "Primary CTA link" },
-      { key: "heroSecondaryCtaLabel", label: "Secondary CTA label" },
-      { key: "heroSecondaryCtaLink", label: "Secondary CTA link" },
+      { key: "heroKicker", label: "Introductory label" },
+      { key: "heroHeadline", label: "Main heading", type: "textarea" },
+      { key: "heroText", label: "Main introduction", type: "textarea" },
     ],
   },
   {
-    title: "Founder",
-    fields: [
-      { key: "founderKicker", label: "Kicker" },
-      { key: "founderTitle", label: "Title", type: "textarea" },
-      { key: "founderText", label: "Text", type: "textarea" },
-    ],
-  },
-  {
-    title: "Background",
-    fields: [
-      { key: "backgroundKicker", label: "Kicker" },
-      { key: "backgroundTitle", label: "Title", type: "textarea" },
-      { key: "backgroundText", label: "Text", type: "textarea" },
-    ],
-  },
-  {
-    title: "Philosophy",
-    fields: [
-      { key: "philosophyKicker", label: "Kicker" },
-      { key: "philosophyTitle", label: "Title", type: "textarea" },
-      { key: "philosophyText", label: "Text", type: "textarea" },
-    ],
-  },
-  {
-    title: "Weightlifting focus",
-    fields: [
-      { key: "weightliftingKicker", label: "Kicker" },
-      { key: "weightliftingTitle", label: "Title", type: "textarea" },
-      { key: "weightliftingText", label: "Text", type: "textarea" },
-    ],
-  },
-  {
-    title: "Why Attempt exists",
+    title: "Attempt: what it stands for",
     fields: [
       { key: "whyKicker", label: "Kicker" },
-      { key: "whyTitle", label: "Title", type: "textarea" },
+      { key: "whyTitle", label: "Heading", type: "textarea" },
       { key: "whyText", label: "Text", type: "textarea" },
     ],
   },
   {
-    title: "Final CTA",
+    title: "Attempt: meaning behind the name",
     fields: [
-      { key: "finalCtaTitle", label: "Title", type: "textarea" },
-      { key: "finalCtaText", label: "Text", type: "textarea" },
+      { key: "weightliftingKicker", label: "Kicker" },
+      { key: "weightliftingTitle", label: "Heading", type: "textarea" },
+      { key: "weightliftingText", label: "Text", type: "textarea" },
+    ],
+  },
+  {
+    title: "Attempt: coaching approach",
+    fields: [
+      { key: "philosophyKicker", label: "Kicker" },
+      { key: "philosophyTitle", label: "Heading", type: "textarea" },
+      { key: "philosophyText", label: "Text", type: "textarea" },
+    ],
+  },
+  {
+    title: "Transition into The Coach",
+    fields: [
+      { key: "transitionText", label: "Transition text", type: "textarea" },
+    ],
+  },
+  {
+    title: "The Coach: introduction",
+    fields: [
+      { key: "founderKicker", label: "Section label" },
+      { key: "founderTitle", label: "Coach heading", type: "textarea" },
+      { key: "founderText", label: "Coach introduction", type: "textarea" },
+    ],
+  },
+  {
+    title: "The Coach: coach and athlete",
+    fields: [
+      { key: "backgroundKicker", label: "Kicker" },
+      { key: "backgroundTitle", label: "Heading", type: "textarea" },
+      { key: "backgroundText", label: "Text", type: "textarea" },
+    ],
+  },
+  {
+    title: "The Coach: credentials and experience",
+    fields: [
+      { key: "credentialsKicker", label: "Kicker" },
+      { key: "credentialsTitle", label: "Heading", type: "textarea" },
+      {
+        key: "credentialsText",
+        label: "Experience entries",
+        type: "textarea",
+      },
+    ],
+  },
+  {
+    title: "The Coach: closing statement",
+    fields: [
+      { key: "closingKicker", label: "Kicker" },
+      { key: "closingTitle", label: "Heading", type: "textarea" },
+      { key: "closingText", label: "Text", type: "textarea" },
+    ],
+  },
+  {
+    title: "Call to action",
+    fields: [
+      { key: "finalCtaTitle", label: "CTA heading", type: "textarea" },
+      { key: "finalCtaText", label: "CTA text", type: "textarea" },
       { key: "finalCtaButtonLabel", label: "Button label" },
-      { key: "finalCtaButtonLink", label: "Button link" },
+      { key: "finalCtaButtonLink", label: "Button destination" },
+      { key: "finalCtaSecondaryLabel", label: "Secondary button label" },
+      { key: "finalCtaSecondaryLink", label: "Secondary button destination" },
     ],
   },
 ];

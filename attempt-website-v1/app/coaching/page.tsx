@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { PublicLayout } from "@/components/PublicLayout";
 import { Section } from "@/components/Section";
 import { CardGrid } from "@/components/CardGrid";
@@ -94,16 +93,6 @@ export default async function CoachingPage() {
             <li key={item}>{item}</li>
           ))}
         </ul>
-      </Section>
-
-      <Section
-        kicker={content.availabilityKicker}
-        title={content.availabilityTitle}
-        text={content.availabilityText}
-      >
-        <Link className="btn btnPrimary" href={content.availabilityCtaLink}>
-          {content.availabilityCtaLabel}
-        </Link>
       </Section>
 
       <Section kicker={content.faqKicker} title={content.faqTitle}>

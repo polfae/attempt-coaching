@@ -63,9 +63,7 @@ export function PublicFooter({ settings }: { settings?: SiteSettings }) {
               <div className="footerLinks">
                 <Link href="/apply">Apply</Link>
                 <Link href="/contact">Contact</Link>
-                {safeSettings.contactEmail && (
-                  <a href={`mailto:${safeSettings.contactEmail}`}>Email</a>
-                )}
+                <Link href="/faq">FAQ</Link>
                 {safeSettings.instagramUrl && (
                   <a
                     href={safeSettings.instagramUrl}

@@ -133,16 +133,6 @@ const sections: { title: string; fields: FieldConfig[] }[] = [
     ],
   },
   {
-    title: "Availability",
-    fields: [
-      { key: "availabilityKicker", label: "Kicker" },
-      { key: "availabilityTitle", label: "Title", type: "textarea" },
-      { key: "availabilityText", label: "Text", type: "textarea" },
-      { key: "availabilityCtaLabel", label: "CTA label" },
-      { key: "availabilityCtaLink", label: "CTA link" },
-    ],
-  },
-  {
     title: "FAQ",
     fields: [
       { key: "faqKicker", label: "Kicker" },

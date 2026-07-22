@@ -220,6 +220,11 @@ export const adminLinks = [
     description: "Create, edit, publish, and manage educational articles.",
   },
   {
+    href: "/admin/faq",
+    label: "FAQ",
+    description: "Manage public questions, answers, order, and visibility.",
+  },
+  {
     href: "/admin/testimonials",
     label: "Testimonials",
     description: "Manage athlete stories and homepage proof.",

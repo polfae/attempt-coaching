@@ -14,6 +14,12 @@ const revealSelector = [
   ".panel",
   ".processCard",
   ".trustPanel article",
+  ".recentArticlesHeader",
+  ".recentArticleCard",
+  ".aboutTextStack",
+  ".aboutImageFrame",
+  ".aboutBridge",
+  ".aboutCredentialRows li",
 ].join(",");
 
 export function ScrollReveal() {

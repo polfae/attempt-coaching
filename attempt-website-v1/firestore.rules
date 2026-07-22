@@ -43,6 +43,11 @@ service cloud.firestore {
       allow create, update, delete: if isAdmin();
     }
 
+    match /faqItems/{id} {
+      allow read: if resource.data.isVisible == true || isAdmin();
+      allow create, update, delete: if isAdmin();
+    }
+
     match /siteSettings/{id} { allow read: if true; allow write: if isAdmin(); }
     match /homepage/{id} { allow read: if true; allow write: if isAdmin(); }
     match /pages/{id} { allow read: if true; allow write: if isAdmin(); }

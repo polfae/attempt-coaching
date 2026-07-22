@@ -6,6 +6,7 @@ import {
   getDoc,
   getDocs,
   limit,
+  limitToLast,
   orderBy,
   query,
   serverTimestamp,
@@ -110,11 +111,45 @@ export type Article = {
   author: string;
   body: string;
   status: ArticleStatus;
+  scheduledAt?: string;
   publishedAt?: string;
   publishAtMillis?: number;
   seoTitle?: string;
   seoDescription?: string;
   readingTime?: string;
+  createdAt?: unknown;
+  updatedAt?: unknown;
+};
+
+export type PublicArticleSummary = {
+  id?: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  featuredImage?: string;
+  category: string;
+  publishedAt?: string;
+  readingTime?: string;
+};
+
+export type ArticlesPageCursor = {
+  publishedAt: string;
+  publishAtMillis: number;
+  id: string;
+};
+
+export type RecentArticlesPage = {
+  articles: PublicArticleSummary[];
+  cursor: ArticlesPageCursor | null;
+  hasMore: boolean;
+};
+
+export type FaqItem = {
+  id?: string;
+  question: string;
+  answer: string;
+  order: number;
+  isVisible: boolean;
   createdAt?: unknown;
   updatedAt?: unknown;
 };
@@ -349,10 +384,22 @@ export type AboutContent = {
   whyTitle: string;
   whyText: string;
 
+  transitionText: string;
+
+  credentialsKicker: string;
+  credentialsTitle: string;
+  credentialsText: string;
+
+  closingKicker: string;
+  closingTitle: string;
+  closingText: string;
+
   finalCtaTitle: string;
   finalCtaText: string;
   finalCtaButtonLabel: string;
   finalCtaButtonLink: string;
+  finalCtaSecondaryLabel: string;
+  finalCtaSecondaryLink: string;
 
   seoTitle?: string;
   seoDescription?: string;
@@ -545,47 +592,116 @@ export const defaultAboutContent: AboutContent = {
   seoTitle: "About Attempt | Weightlifting Coaching",
   seoDescription:
     "Learn about Attempt, a weightlifting-only coaching brand built around serious training, technical feedback, and better competition preparation.",
-  heroKicker: "About Attempt",
-  heroHeadline: "Built by a coach who understands the platform.",
+  heroKicker: "About",
+  heroHeadline: "More than a programme. A better way to approach progress.",
   heroText:
-    "Attempt exists to connect serious weightlifting coaching, better competition preparation, and practical tools for lifters who want clearer decisions in training and on meet day.",
+    "Attempt is an Olympic weightlifting coaching platform built around one simple idea: meaningful progress should never be left to chance.\n\nEvery athlete arrives with different strengths, limitations, experience, and ambitions. Attempt exists to turn those differences into a clear direction through individual programming, honest communication, and coaching decisions made with purpose.\n\nIt is not about chasing perfect training weeks or constantly searching for the next secret. It is about understanding what matters, doing it consistently, and adjusting the process as the athlete develops.",
   heroPrimaryCtaLabel: "Apply for Coaching",
   heroPrimaryCtaLink: "/apply",
   heroSecondaryCtaLabel: "See Coaching",
   heroSecondaryCtaLink: "/coaching",
 
-  founderKicker: "Founder",
-  founderTitle: "Pól Hendrikur Andreasen",
+  founderKicker: "The Coach",
+  founderTitle: "The person behind Attempt",
   founderText:
-    "Attempt is built around hands-on coaching in Olympic weightlifting, athlete development, and competition preparation. The goal is simple: help lifters train with more direction and compete with more clarity.",
+    "I am Pól Hendrikur Andreasen, an Olympic weightlifting coach and competitive weightlifter from the Faroe Islands.\n\nI created Attempt to offer the kind of coaching I believe athletes deserve: individual, honest, and built around a clear understanding of the person behind the numbers.\n\nMy role is not simply to write training sessions. It is to observe, question, adjust, and help each athlete understand what will move them forward.",
 
-  backgroundKicker: "Background",
-  backgroundTitle:
-    "Coaching experience from the training hall to the platform.",
+  backgroundKicker: "Coach and athlete",
+  backgroundTitle: "Experience from both sides of the bar.",
   backgroundText:
-    "Use this section to describe your weightlifting background, your work as a coach, your federation experience, and your role developing athletes and systems around performance. The stronger this gets, the more trust the site will carry.",
+    "My perspective has been shaped by experiencing weightlifting from both sides of the bar.\n\nAs an athlete, I understand the frustration of technical inconsistency, missed lifts, plateaus, and competition pressure. I also understand how much confidence can grow when training begins to make sense.\n\nAs a coach, the responsibility is different. The coach has to step back, recognise patterns, and make decisions based on what the athlete needs, not simply what looks impressive on paper.",
 
-  philosophyKicker: "Philosophy",
-  philosophyTitle: "Coaching and competition tools belong together.",
+  philosophyKicker: "Coaching approach",
+  philosophyTitle: "Coaching with a clear reason behind every decision.",
   philosophyText:
-    "Training should prepare the athlete for the platform. Programming, technical feedback, warm-up decisions, attempt selection, and competition strategy are all part of the same process.",
+    "A programme is only useful when it reflects what is actually happening.\n\nTraining is reviewed and adjusted according to performance, recovery, technical development, and the demands of the athlete's wider life. Good coaching is not simply delivering a spreadsheet. It is understanding when to push, when to reduce, what to prioritise, and why.\n\nAttempt aims to give athletes both structure and context. The athlete should know what they are doing, but also understand what the work is intended to improve.",
 
-  weightliftingKicker: "Weightlifting only",
-  weightliftingTitle: "Attempt is focused on Olympic weightlifting.",
+  weightliftingKicker: "Meaning",
+  weightliftingTitle: "Why Attempt?",
   weightliftingText:
-    "Attempt is not general fitness coaching. It is built for lifters who want to improve the snatch, clean & jerk, total, and competition process.",
+    "Every meaningful result begins with an attempt.\n\nThe first attempt at a new movement. The attempt that misses. The attempt made after a difficult training period. The attempt on the competition platform when the outcome is still uncertain.\n\nWeightlifting rarely offers guarantees. It asks the athlete to prepare carefully, commit fully, and accept that progress is built through repeated effort. Attempt represents that process: the willingness to keep showing up, learning, and trying again with better preparation than before.",
 
-  whyKicker: "Why Attempt exists",
-  whyTitle: "Better structure. Better feedback. Better meet-day decisions.",
+  whyKicker: "What Attempt stands for",
+  whyTitle: "Built around the athlete.",
   whyText:
-    "Attempt was created because lifters need more than a spreadsheet. They need a connected process from daily training to platform execution.",
+    "No two athletes move, recover, learn, or respond to training in exactly the same way. That is why Attempt does not begin with a fixed template. It begins with the athlete.\n\nProgramming, technical priorities, training volume, and competition preparation should reflect the person doing the work. The plan still needs structure, but it must also be able to evolve.\n\nThe goal is not to create the most complicated programme. The goal is to make the right decisions often enough, for long enough, that progress becomes difficult to avoid.",
 
-  finalCtaTitle: "Ready to work with Attempt?",
+  transitionText:
+    "Attempt is the system, the philosophy, and the standard behind the coaching. But coaching is still a relationship between people. Behind Attempt is one coach responsible for the programming, communication, and decisions that shape the process.",
+
+  credentialsKicker: "Experience",
+  credentialsTitle: "Relevant experience.",
+  credentialsText:
+    "Olympic weightlifting coach\nCompetitive Olympic weightlifter\nStrength and conditioning coach for the Faroese Handball Federation\nHead coach of Styrkifelagið Stoyt\nExperience coaching athletes with different levels, goals, and training histories\nExperience with long-term development and competition preparation",
+
+  closingKicker: "Together",
+  closingTitle: "One philosophy. Personal coaching.",
+  closingText:
+    "Attempt is not separate from the way I coach. It is the name given to the principles behind the work.\n\nIndividual attention, purposeful training, honest feedback, and the willingness to adjust are not additional features. They are the foundation.\n\nThe brand may be Attempt, but the coaching remains personal. Every programme, review, and decision is made with the athlete's development in mind.",
+
+  finalCtaTitle: "Your next attempt should have a clear direction.",
   finalCtaText:
-    "Apply for coaching if you want a structured process for your training, your technique, and your platform goals.",
+    "Tell me where you are, what you are working toward, and what has been holding you back. From there, we can decide whether Attempt is the right coaching environment for you.",
   finalCtaButtonLabel: "Apply for Coaching",
   finalCtaButtonLink: "/apply",
+  finalCtaSecondaryLabel: "Explore Coaching",
+  finalCtaSecondaryLink: "/coaching",
 };
+
+function applyAboutContentMigrations(content: AboutContent): AboutContent {
+  const legacyDefaults: Partial<AboutContent> = {
+    heroKicker: "About Attempt",
+    heroHeadline: "Built by a coach who understands the platform.",
+    founderText:
+      "Attempt is built around hands-on coaching in Olympic weightlifting, athlete development, and competition preparation. The goal is simple: help lifters train with more direction and compete with more clarity.",
+    backgroundKicker: "Background",
+    backgroundTitle:
+      "Coaching experience from the training hall to the platform.",
+    backgroundText:
+      "Use this section to describe your weightlifting background, your work as a coach, your federation experience, and your role developing athletes and systems around performance. The stronger this gets, the more trust the site will carry.",
+    philosophyTitle: "Coaching and competition tools belong together.",
+    philosophyText:
+      "Training should prepare the athlete for the platform. Programming, technical feedback, warm-up decisions, attempt selection, and competition strategy are all part of the same process.",
+    finalCtaTitle: "Ready to work with Attempt?",
+    finalCtaText:
+      "Apply for coaching if you want a structured process for your training, your technique, and your platform goals.",
+    founderKicker: "Founder",
+    founderTitle: "Pól Hendrikur Andreasen",
+    weightliftingKicker: "Weightlifting only",
+    weightliftingTitle: "Attempt is focused on Olympic weightlifting.",
+    weightliftingText:
+      "Attempt is not general fitness coaching. It is built for lifters who want to improve the snatch, clean & jerk, total, and competition process.",
+    whyKicker: "Why Attempt exists",
+    whyTitle: "Better structure. Better feedback. Better meet-day decisions.",
+    whyText:
+      "Attempt was created because lifters need more than a spreadsheet. They need a connected process from daily training to platform execution.",
+  };
+
+  const migratedContent = Object.entries(legacyDefaults).reduce(
+    (updatedContent, [key, value]) => {
+      const aboutKey = key as keyof AboutContent;
+
+      if (updatedContent[aboutKey] === value) {
+        return {
+          ...updatedContent,
+          [aboutKey]: defaultAboutContent[aboutKey],
+        };
+      }
+
+      return updatedContent;
+    },
+    content,
+  );
+
+  if (migratedContent.heroKicker.toLowerCase().startsWith("about attempt")) {
+    return {
+      ...migratedContent,
+      heroKicker: defaultAboutContent.heroKicker,
+    };
+  }
+
+  return migratedContent;
+}
 
 async function readWithFallback<T>(
   label: string,
@@ -784,6 +900,78 @@ function estimateReadingTime(body: string) {
   return `${Math.max(1, Math.ceil(words.length / 220))} min read`;
 }
 
+function isPublicArticle(article: Article) {
+  if (
+    !article.slug ||
+    !article.title ||
+    !article.excerpt ||
+    !article.publishedAt ||
+    typeof article.publishAtMillis !== "number"
+  ) {
+    return false;
+  }
+
+  if (article.status === "published") {
+    return true;
+  }
+
+  return (
+    article.status === "scheduled" &&
+    typeof article.publishAtMillis === "number" &&
+    article.publishAtMillis <= Date.now()
+  );
+}
+
+function toPublicArticleSummary(article: Article): PublicArticleSummary {
+  return {
+    id: article.id,
+    title: article.title,
+    slug: article.slug,
+    excerpt: article.excerpt,
+    featuredImage: article.featuredImage,
+    category: article.category,
+    publishedAt: article.publishedAt,
+    readingTime: article.readingTime,
+  };
+}
+
+function buildRecentArticlesPage(
+  articles: Article[],
+  pageSize: number,
+  cursor: ArticlesPageCursor | null,
+): RecentArticlesPage {
+  const visibleArticles = articles
+    .filter(isPublicArticle)
+    .filter(
+      (article) =>
+        !cursor ||
+        (typeof article.publishAtMillis === "number" &&
+          article.publishAtMillis < cursor.publishAtMillis),
+    )
+    .sort((a, b) => {
+      const dateDiff = (b.publishAtMillis ?? 0) - (a.publishAtMillis ?? 0);
+      if (dateDiff !== 0) return dateDiff;
+      return (b.id ?? b.slug).localeCompare(a.id ?? a.slug);
+    });
+  const pageArticles = visibleArticles.slice(0, pageSize);
+  const finalArticle = pageArticles[pageArticles.length - 1];
+
+  return {
+    articles: pageArticles.map(toPublicArticleSummary),
+    cursor:
+      finalArticle?.id &&
+      finalArticle.publishedAt &&
+      typeof finalArticle.publishAtMillis === "number"
+        ? {
+            id: finalArticle.id,
+            publishedAt: finalArticle.publishedAt,
+            publishAtMillis: finalArticle.publishAtMillis,
+          }
+        : null,
+    hasMore: visibleArticles.length > pageSize,
+  };
+}
+
 export async function getArticles() {
   if (!hasFirebaseConfig || !db) return sampleArticles;
 
@@ -827,6 +1015,76 @@ export async function getPublishedArticles() {
       return bDate.localeCompare(aDate);
     });
   });
+}
+
+export async function getRecentPublishedArticlesPage({
+  pageSize = 3,
+  cursor = null,
+}: {
+  pageSize?: number;
+  cursor?: ArticlesPageCursor | null;
+} = {}): Promise<RecentArticlesPage> {
+  const fallbackArticles = sampleArticles
+    .filter(isPublicArticle)
+    .sort((a, b) => {
+      const dateDiff = (b.publishAtMillis ?? 0) - (a.publishAtMillis ?? 0);
+      if (dateDiff !== 0) return dateDiff;
+      return (b.id ?? b.slug).localeCompare(a.id ?? a.slug);
+    });
+
+  if (!hasFirebaseConfig || !db) {
+    return buildRecentArticlesPage(fallbackArticles, pageSize, cursor);
+  }
+
+  try {
+      const batchSize = pageSize + 1;
+      const publishedConstraints = [
+        where("status", "==", "published"),
+        ...(cursor ? [where("publishAtMillis", "<", cursor.publishAtMillis)] : []),
+        orderBy("publishAtMillis", "asc"),
+        limitToLast(batchSize),
+      ];
+      const scheduledConstraints = [
+        where("status", "==", "scheduled"),
+        where("publishAtMillis", "<=", Date.now()),
+        ...(cursor ? [where("publishAtMillis", "<", cursor.publishAtMillis)] : []),
+        orderBy("publishAtMillis", "asc"),
+        limitToLast(batchSize),
+      ];
+      const publishedQuery = query(collection(db, "articles"), ...publishedConstraints);
+      const scheduledQuery = query(collection(db, "articles"), ...scheduledConstraints);
+
+      const [publishedSnapshot, scheduledSnapshot] = await Promise.all([
+        getDocs(publishedQuery),
+        getDocs(scheduledQuery),
+      ]);
+
+      const visibleArticles = [
+        ...publishedSnapshot.docs,
+        ...scheduledSnapshot.docs,
+      ]
+        .map((item) => ({
+          id: item.id,
+          ...item.data(),
+        }) as Article)
+        .filter(isPublicArticle)
+        .sort((a, b) => {
+          const dateDiff = (b.publishAtMillis ?? 0) - (a.publishAtMillis ?? 0);
+          if (dateDiff !== 0) return dateDiff;
+          return (b.id ?? b.slug).localeCompare(a.id ?? a.slug);
+        });
+
+      return buildRecentArticlesPage(visibleArticles, pageSize, null);
+  } catch (error) {
+    console.warn(
+      "Unable to read recent articles with cursor pagination. Falling back to existing published article read.",
+      error,
+    );
+
+    const publishedArticles = (await getPublishedArticles()) as Article[];
+
+    return buildRecentArticlesPage(publishedArticles, pageSize, cursor);
+  }
 }
 
 export async function getPublishedArticleBySlug(slug: string) {
@@ -894,6 +1152,131 @@ export async function deleteArticle(id: string) {
   }
 
   return deleteDoc(doc(db, "articles", id));
+}
+
+const sampleFaqItems: FaqItem[] = [
+  {
+    id: "who-is-attempt-for",
+    question: "Who is Attempt Coaching for?",
+    answer:
+      "Attempt Coaching is for Olympic weightlifters who want structured training, technical feedback, and a clearer process from training to competition.",
+    order: 1,
+    isVisible: true,
+  },
+  {
+    id: "competition-experience",
+    question: "Do I need competition experience to apply?",
+    answer:
+      "No. You can apply without competition experience, as long as you are serious about learning the lifts properly and following a structured plan.",
+    order: 2,
+    isVisible: true,
+  },
+  {
+    id: "application-process",
+    question: "How does the coaching application work?",
+    answer:
+      "You submit the application with your background, current lifts, goals, and coaching fit. The full application is reviewed inside the admin panel before a decision is made.",
+    order: 3,
+    isVisible: true,
+  },
+  {
+    id: "programs-vs-coaching",
+    question: "Are digital programs the same as coaching?",
+    answer:
+      "No. Programs provide structure, while coaching adds individual programming, feedback, adjustments, and competition preparation around your actual training.",
+    order: 4,
+    isVisible: true,
+  },
+  {
+    id: "app-access",
+    question: "Do coached athletes get access to the Attempt app?",
+    answer:
+      "Yes. Active coached athletes receive access to the Attempt app as part of the coaching process.",
+    order: 5,
+    isVisible: true,
+  },
+];
+
+function sortFaqItems(items: FaqItem[]) {
+  return [...items].sort((a, b) => {
+    const orderDiff = (a.order ?? 0) - (b.order ?? 0);
+    if (orderDiff !== 0) return orderDiff;
+    return a.question.localeCompare(b.question);
+  });
+}
+
+export async function getFaqItems() {
+  return readWithFallback("FAQ items", sampleFaqItems, async (activeDb) => {
+    const snapshot = await getDocs(
+      query(collection(activeDb, "faqItems"), orderBy("order", "asc")),
+    );
+
+    return sortFaqItems(
+      snapshot.docs.map((item) => ({
+        id: item.id,
+        ...item.data(),
+      })) as FaqItem[],
+    );
+  });
+}
+
+export async function getVisibleFaqItems() {
+  return readWithFallback("visible FAQ items", sampleFaqItems, async (activeDb) => {
+    const snapshot = await getDocs(
+      query(
+        collection(activeDb, "faqItems"),
+        where("isVisible", "==", true),
+        orderBy("order", "asc"),
+      ),
+    );
+
+    return sortFaqItems(
+      snapshot.docs.map((item) => ({
+        id: item.id,
+        ...item.data(),
+      })) as FaqItem[],
+    );
+  });
+}
+
+export async function createFaqItem(data: FaqItem) {
+  if (!hasFirebaseConfig || !db) {
+    console.info("Firebase not configured. FAQ payload:", data);
+    return { offline: true };
+  }
+
+  const { id, ...faqData } = data;
+  const faqRef = doc(collection(db, "faqItems"));
+
+  await setDoc(faqRef, {
+    ...faqData,
+    id: faqRef.id,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+
+  return faqRef;
+}
+
+export async function updateFaqItem(id: string, data: Partial<FaqItem>) {
+  if (!hasFirebaseConfig || !db) {
+    console.info("Firebase not configured. FAQ update:", id, data);
+    return { offline: true };
+  }
+
+  return updateDoc(doc(db, "faqItems", id), {
+    ...data,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function deleteFaqItem(id: string) {
+  if (!hasFirebaseConfig || !db) {
+    console.info("Firebase not configured. FAQ delete:", id);
+    return { offline: true };
+  }
+
+  return deleteDoc(doc(db, "faqItems", id));
 }
 
 export async function getTestimonials() {
@@ -1194,10 +1577,12 @@ export async function getAboutContent() {
         return defaultAboutContent;
       }
 
-      return {
+      const content = {
         ...defaultAboutContent,
         ...snapshot.data(),
       } as AboutContent;
+
+      return applyAboutContentMigrations(content);
     },
   );
 }

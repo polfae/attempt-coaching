@@ -5,6 +5,7 @@ import { PublicLayout } from "@/components/PublicLayout";
 import { Section } from "@/components/Section";
 import { CardGrid } from "@/components/CardGrid";
 import { NewsletterForm } from "@/components/NewsletterForm";
+import { RecentArticlesSection } from "./RecentArticlesSection";
 import {
   coachingProcess,
   coachingFeatures,
@@ -17,6 +18,7 @@ import {
 } from "@/lib/content";
 import {
   getHomepageContent,
+  getRecentPublishedArticlesPage,
   getVisiblePrograms,
   getVisibleTestimonials,
 } from "@/lib/firestore";
@@ -57,6 +59,9 @@ export default async function HomePage() {
   const content = await getHomepageContent();
   const testimonials = (await getVisibleTestimonials()) as any[];
   const programs = (await getVisiblePrograms()) as any[];
+  const recentArticlesPage = await getRecentPublishedArticlesPage({
+    pageSize: 3,
+  });
   const availableTestimonials =
     testimonials.length > 0 ? testimonials : fallbackTestimonials;
 
@@ -304,6 +309,12 @@ export default async function HomePage() {
           </Link>
         </div>
       </Section>
+
+      <RecentArticlesSection
+        initialArticles={recentArticlesPage.articles}
+        initialCursor={recentArticlesPage.cursor}
+        initialHasMore={recentArticlesPage.hasMore}
+      />
 
       <Section
         kicker={content.newsletterKicker}
